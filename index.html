@@ -1,517 +1,611 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Digital Produktkatalog</title>
-<style>
-:root {
---primary-color: rgb(88, 197, 202);
---primary-dark: rgb(68, 167, 172);
---bg-color: #f4f7f9;
---card-bg: #ffffff;
---text-color: #1e293b;
---text-muted: #64748b;
---border-color: #e2e8f0;
-}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Produktkatalog</title>
+    <style>
+        :root {
+            --primary-color: rgb(88, 197, 202);
+            --primary-dark: rgb(68, 167, 172);
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+        }
 
-* {
-box-sizing: border-box;
-margin: 0;
-padding: 0;
-font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
 
-body {
-background-color: var(--bg-color);
-color: var(--text-color);
-padding: 30px 20px;
-}
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 30px 20px;
+        }
 
-.container {
-max-width: 1400px;
-margin: 0 auto;
-}
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
 
-/* Header & Sök */
-header {
-background: var(--card-bg);
-padding: 30px;
-border-radius: 20px;
-box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
-margin-bottom: 30px;
-display: flex;
-flex-direction: column;
-gap: 20px;
-}
+        /* Header & Sök */
+        header {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-@media (min-width: 768px) {
-header {
-flex-direction: row;
-justify-content: space-between;
-align-items: center;
-}
-}
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
 
-.header-title h2 {
-font-size: 24px;
-font-weight: 700;
-color: #0f172a;
-}
+        .header-title h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #0f172a;
+        }
 
-.header-title p {
-font-size: 14px;
-color: var(--text-muted);
-margin-top: 4px;
-}
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
 
-.search-bar {
-position: relative;
-width: 100%;
-max-width: 500px;
-}
+        .search-bar {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+        }
 
-.search-bar input {
-width: 100%;
-padding: 14px 24px;
-border: 2px solid var(--border-color);
-border-radius: 50px;
-font-size: 15px;
-transition: all 0.3s ease;
-outline: none;
-background: #f8fafc;
-}
+        .search-bar input {
+            width: 100%;
+            padding: 14px 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            background: #f8fafc;
+        }
 
-.search-bar input:focus {
-background: #fff;
-border-color: var(--primary-color);
-box-shadow: 0 0 0 4px rgba(88, 197, 202, 0.15);
-}
+        .search-bar input:focus {
+            background: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(88, 197, 202, 0.15);
+        }
 
-/* Layout Uppdelning */
-.main-layout {
-display: grid;
-grid-template-columns: 280px 1fr;
-gap: 30px;
-}
+        /* Layout Uppdelning */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 30px;
+        }
 
-@media (max-width: 992px) {
-.main-layout {
-grid-template-columns: 1fr;
-}
-}
+        @media (max-width: 992px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+            }
+        }
 
-/* Filterträd / Sidomeny */
-.sidebar {
-background: var(--card-bg);
-padding: 24px;
-border-radius: 20px;
-box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
-height: fit-content;
-}
+        /* Filterträd / Sidomeny */
+        .sidebar {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
+            height: fit-content;
+        }
 
-.sidebar h3 {
-font-size: 16px;
-font-weight: 700;
-text-transform: uppercase;
-letter-spacing: 0.5px;
-margin-bottom: 20px;
-padding-bottom: 10px;
-border-bottom: 2px solid #f1f5f9;
-}
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f1f5f9;
+        }
 
-.tree-menu {
-list-style: none;
-}
+        .tree-menu {
+            list-style: none;
+        }
 
-.tree-item {
-margin: 6px 0;
-font-size: 15px;
-}
+        .tree-item {
+            margin: 6px 0;
+            font-size: 15px;
+        }
 
-.tree-label {
-display: flex;
-align-items: center;
-padding: 10px 14px;
-border-radius: 10px;
-cursor: pointer;
-color: #334155;
-font-weight: 500;
-transition: all 0.2s ease;
-}
+        .tree-label {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            color: #334155;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
 
-.tree-label:hover {
-background: #f1f5f9;
-color: #000;
-}
+        .tree-label:hover {
+            background: #f1f5f9;
+            color: #000;
+        }
 
-.tree-label.active {
-background: rgba(88, 197, 202, 0.1);
-color: var(--primary-dark);
-font-weight: 600;
-}
+        .tree-label.active {
+            background: rgba(88, 197, 202, 0.1);
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
 
-.tree-icon {
-margin-right: 10px;
-font-size: 16px;
-}
+        .tree-icon {
+            margin-right: 10px;
+            font-size: 14px;
+            transition: transform 0.2s ease;
+            display: inline-block;
+        }
 
-.sub-menu {
-list-style: none;
-padding-left: 24px;
-margin-top: 4px;
-}
+        /* Kollaps-logik för undermenyn */
+        .sub-menu {
+            list-style: none;
+            padding-left: 24px;
+            margin-top: 4px;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1); /* Mjuk öppning */
+        }
 
-/* Produktgalleri (3 Kolumner) */
-.gallery-container {
-display: flex;
-flex-direction: column;
-gap: 20px;
-}
+        /* När en meny är expanderad */
+        .tree-item.expanded .sub-menu {
+            max-height: 500px; /* Tillräckligt stor höjd för att rymma underalternativ */
+            transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+        }
 
-.gallery-header {
-display: flex;
-justify-content: space-between;
-align-items: center;
-padding: 0 5px;
-}
+        .tree-item.expanded .toggle-arrow {
+            transform: rotate(90deg); /* Roterar pilen neråt vid öppning */
+        }
 
-#product-count {
-font-size: 15px;
-font-weight: 600;
-color: var(--text-muted);
-}
+        /* Produktgalleri (3 Kolumner) */
+        .gallery-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
 
-.product-grid {
-display: grid;
-grid-template-columns: repeat(3, 1fr);
-gap: 25px;
-}
+        .gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 5px;
+        }
 
-@media (max-width: 1200px) {
-.product-grid { grid-template-columns: repeat(2, 1fr); }
-}
-@media (max-width: 650px) {
-.product-grid { grid-template-columns: 1fr; }
-}
+        #product-count {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-muted);
+        }
 
-/* Produktkort */
-.product-card {
-background: var(--card-bg);
-border-radius: 20px;
-padding: 24px;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
-display: flex;
-flex-direction: column;
-justify-content: space-between;
-position: relative;
-transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
-border: 1px solid #f1f5f9;
-}
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
 
-.product-card:hover {
-transform: translateY(-6px);
-box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-border-color: rgba(88, 197, 202, 0.3);
-}
+        @media (max-width: 1200px) {
+            .product-grid { grid-template-columns: repeat(2, 1fr); }
+        }
+        @media (max-width: 650px) {
+            .product-grid { grid-template-columns: 1fr; }
+        }
 
-.badge {
-position: absolute;
-top: 20px;
-left: 20px;
-background: var(--primary-color);
-color: white;
-padding: 5px 12px;
-border-radius: 30px;
-font-size: 11px;
-font-weight: 700;
-letter-spacing: 0.5px;
-z-index: 2;
-box-shadow: 0 2px 10px rgba(88, 197, 202, 0.2);
-}
+        /* Produktkort */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            position: relative;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+            border: 1px solid #f1f5f9;
+        }
 
-.product-image {
-width: 100%;
-height: 200px;
-background: #f8fafc;
-border-radius: 14px;
-margin-bottom: 20px;
-display: flex;
-align-items: center;
-justify-content: center;
-transition: background 0.2s ease;
-}
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+            border-color: rgba(88, 197, 202, 0.3);
+        }
 
-.product-card:hover .product-image {
-background: #f1f5f9;
-}
+        .badge {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            z-index: 2;
+            box-shadow: 0 2px 10px rgba(88, 197, 202, 0.2);
+        }
 
-.brand {
-font-size: 11px;
-text-transform: uppercase;
-font-weight: 700;
-color: var(--primary-dark);
-letter-spacing: 0.8px;
-margin-bottom: 6px;
-}
+        .product-image {
+            width: 100%;
+            height: 200px;
+            background: #f8fafc;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
 
-.title {
-font-size: 16px;
-font-weight: 600;
-color: #0f172a;
-margin-bottom: 8px;
-line-height: 1.4;
-height: 44px;
-overflow: hidden;
-display: -webkit-box;
--webkit-line-clamp: 2;
--webkit-box-orient: vertical;
-}
+        .product-card:hover .product-image {
+            background: #f1f5f9;
+        }
 
-.artnr {
-font-size: 13px;
-color: var(--text-muted);
-margin-bottom: 20px;
-}
+        .brand {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--primary-dark);
+            letter-spacing: 0.8px;
+            margin-bottom: 6px;
+        }
 
-.btn {
-background: var(--primary-color);
-color: white;
-border: none;
-padding: 12px 20px;
-border-radius: 50px;
-font-weight: 600;
-font-size: 14px;
-cursor: pointer;
-width: 100%;
-transition: all 0.2s ease;
-text-align: center;
-box-shadow: 0 4px 12px rgba(88, 197, 202, 0.15);
-}
+        .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 8px;
+            line-height: 1.4;
+            height: 44px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
 
-.btn:hover {
-background: var(--primary-dark);
-box-shadow: 0 6px 16px rgba(88, 197, 202, 0.25);
-}
+        .artnr {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 20px;
+        }
 
-/* Produktsida / Popup (Modal) Bakgrund */
-.modal {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: rgba(15, 23, 42, 0.4);
-backdrop-filter: blur(8px);
-display: flex;
-align-items: center;
-justify-content: center;
-opacity: 0;
-pointer-events: none;
-transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-z-index: 1000;
-}
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(88, 197, 202, 0.15);
+        }
 
-/* När popupen aktiveras/öppnas */
-.modal.open {
-opacity: 1;
-pointer-events: auto;
-}
+        .btn:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 6px 16px rgba(88, 197, 202, 0.25);
+        }
 
-/* Själva popup-kortet */
-.modal-content {
-background: white;
-padding: 40px;
-border-radius: 24px;
-max-width: 800px;
-width: 90%;
-position: relative;
-box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-display: grid;
-grid-template-columns: 1.2fr 1fr;
-gap: 40px;
-transform: translateY(40px) scale(0.95);
-transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
-}
+        /* Produktsida / Popup (Modal) Bakgrund */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 23, 42, 0.4);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 1000;
+        }
 
-/* Animationen när kortet skjuts upp */
-.modal.open .modal-content {
-transform: translateY(0) scale(1);
-}
+        .modal.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
 
-@media (max-width: 768px) {
-.modal-content {
-grid-template-columns: 1fr;
-padding: 30px 24px;
-gap: 24px;
-max-height: 90vh;
-overflow-y: auto;
-}
-}
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 24px;
+            max-width: 800px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 40px;
+            transform: translateY(40px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+        }
 
-/* Stängknapp */
-.close-modal {
-position: absolute;
-top: 20px;
-right: 20px;
-font-size: 24px;
-cursor: pointer;
-border: none;
-background: #f1f5f9;
-color: var(--text-muted);
-width: 40px;
-height: 40px;
-border-radius: 50%;
-display: flex;
-align-items: center;
-justify-content: center;
-transition: all 0.2s ease;
-z-index: 10;
-}
+        .modal.open .modal-content {
+            transform: translateY(0) scale(1);
+        }
 
-.close-modal:hover {
-background: #e2e8f0;
-color: #0f172a;
-transform: rotate(90deg);
-}
+        @media (max-width: 768px) {
+            .modal-content { 
+                grid-template-columns: 1fr; 
+                padding: 30px 24px; 
+                gap: 24px;
+                max-height: 90vh;
+                overflow-y: auto;
+            }
+        }
 
-.modal-image-box {
-background: #f8fafc;
-border-radius: 16px;
-display: flex;
-align-items: center;
-justify-content: center;
-height: 320px;
-border: 1px solid var(--border-color);
-}
-</style>
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 24px;
+            cursor: pointer;
+            border: none;
+            background: #f1f5f9;
+            color: var(--text-muted);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s ease;
+            z-index: 10;
+        }
+
+        .close-modal:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+            transform: rotate(90deg);
+        }
+
+        .modal-image-box {
+            background: #f8fafc; 
+            border-radius: 16px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            height: 320px;
+            border: 1px solid var(--border-color);
+        }
+    </style>
 </head>
 <body>
 
 <div class="container">
-<header>
-<div class="header-title">
-<h2>Digital Produktkatalog</h2>
-<p>Internportal för organisationen</p>
-</div>
-<div class="search-bar">
-<input type="text" id="searchInput" placeholder="Sök bland 50 000 produkter, art.nr eller märke...">
-</div>
-</header>
+    <header>
+        <div class="header-title">
+            <h2>Digital Produktkatalog</h2>
+            <p>Internportal för organisationen</p>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Sök bland 50 000 produkter, art.nr eller märke...">
+        </div>
+    </header>
 
-<div class="main-layout">
-<aside class="sidebar">
-<h3>Produktgrupper</h3>
-<ul class="tree-menu">
-<li class="tree-item">
-<div class="tree-label active" id="label-all" onclick="filterCategory('Alla', 'label-all')">
-<span class="tree-icon">📁</span> Visa alla
-</div>
-</li>
-<li class="tree-item">
-<div class="tree-label" style="cursor: default; background: none; font-weight: 700;">
-<span class="tree-icon">▼</span> Inbrottslarm
-</div>
-<ul class="sub-menu">
-<li class="tree-item">
-<div class="tree-label" id="label-ajax" onclick="filterCategory('Ajax Systems', 'label-ajax')">
-<span class="tree-icon">🔹</span> Ajax Systems
-</div>
-</li>
-<li class="tree-item">
-<div class="tree-label" id="label-teletec" onclick="filterCategory('Teletec', 'label-teletec')">
-<span class="tree-icon">🔹</span> Teletec
-</div>
-</li>
-</ul>
-</li>
-<li class="tree-item" style="margin-top: 10px;">
-<div class="tree-label" style="cursor: default; background: none; font-weight: 700;">
-<span class="tree-icon">▼</span> Övrigt
-</div>
-<ul class="sub-menu">
-<li class="tree-item">
-<div class="tree-label" id="label-comp" onclick="filterCategory('Komponenter', 'label-comp')">
-<span class="tree-icon">🔹</span> Komponenter
-</div>
-</li>
-</ul>
-</li>
-</ul>
-</aside>
+    <div class="main-layout">
+        <aside class="sidebar">
+            <h3>Produktgrupper</h3>
+            <ul class="tree-menu">
+                <li class="tree-item">
+                    <div class="tree-label active" id="label-all" onclick="filterCategory('Alla', 'label-all')">
+                        <span class="tree-icon">📁</span> Visa alla
+                    </div>
+                </li>
+                
+                <li class="tree-item" id="menu-inbrott">
+                    <div class="tree-label" onclick="toggleFolder('menu-inbrott')">
+                        <span class="tree-icon toggle-arrow">►</span> <span>📁 Inbrottslarm</span>
+                    </div>
+                    <ul class="sub-menu">
+                        <li class="tree-item">
+                            <div class="tree-label" id="label-ajax" onclick="filterCategory('Ajax Systems', 'label-ajax')">
+                                <span class="tree-icon">🔹</span> Ajax Systems
+                            </div>
+                        </li>
+                        <li class="tree-item">
+                            <div class="tree-label" id="label-teletec" onclick="filterCategory('Teletec', 'label-teletec')">
+                                <span class="tree-icon">🔹</span> Teletec
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+                
+                <li class="tree-item" id="menu-ovrigt">
+                    <div class="tree-label" onclick="toggleFolder('menu-ovrigt')">
+                        <span class="tree-icon toggle-arrow">►</span> <span>📁 Övrigt</span>
+                    </div>
+                    <ul class="sub-menu">
+                        <li class="tree-item">
+                            <div class="tree-label" id="label-comp" onclick="filterCategory('Komponenter', 'label-comp')">
+                                <span class="tree-icon">🔹</span> Komponenter
+                            </div>
+                        </li>
+                    </ul>
+                </li>
+            </ul>
+        </aside>
 
-<main class="gallery-container">
-<div class="gallery-header">
-<span id="product-count">Laddar produkter...</span>
-</div>
-
-<div class="product-grid" id="productGrid">
-</div>
-</main>
-</div>
+        <main class="gallery-container">
+            <div class="gallery-header">
+                <span id="product-count">Visar 0 produkter</span>
+            </div>
+            
+            <div class="product-grid" id="productGrid">
+                </div>
+        </main>
+    </div>
 </div>
 
 <div class="modal" id="productModal" onclick="closeModalOnOutsideClick(event)">
-<div class="modal-content" onclick="event.stopPropagation()">
-<button class="close-modal" onclick="closeModal()">×</button>
-
-<div class="modal-image-box">
-<span style="font-size: 72px;">📦</span>
-</div>
-
-<div style="display: flex; flex-direction: column; justify-content: center;">
-<span id="modalBrand" class="brand">Märke</span>
-<h2 id="modalTitle" style="margin: 10px 0; font-size: 24px; font-weight: 700; color: #0f172a; line-height: 1.3;">Produktnamn</h2>
-<p id="modalArtnr" class="artnr">Art.nr: -</p>
-
-<div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
-<h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; color: #0f172a;">Beskrivning</h4>
-<p id="modalDesc" style="color: var(--text-muted); font-size: 15px; line-height: 1.6;">
-Information laddas...
-</p>
-</div>
-</div>
-</div>
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+        
+        <div class="modal-image-box">
+            <span style="font-size: 72px;">📦</span>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <span id="modalBrand" class="brand">Märke</span>
+            <h2 id="modalTitle" style="margin: 10px 0; font-size: 24px; font-weight: 700; color: #0f172a; line-height: 1.3;">Produktnamn</h2>
+            <p id="modalArtnr" class="artnr">Art.nr: -</p>
+            
+            <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
+                <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; color: #0f172a;">Beskrivning</h4>
+                <p id="modalDesc" style="color: var(--text-muted); font-size: 15px; line-height: 1.6;">
+                    Information laddas...
+                </p>
+            </div>
+        </div>
+    </div>
 </div>
 
 <script>
-// Testdata som simulerar er framtida strukturerade JSON-fil från Excel
-const products = [
-{ id: 1, title: "SIM-kort för Ajax centralapparater", artnr: "50003131", brand: "Ajax Systems", category: "Ajax Systems", badge: "Nyhet" },
-{ id: 2, title: "Motstånd 2.2 KOHM", artnr: "10015656", brand: "Övriga", category: "Komponenter", badge: "" },
-{ id: 3, title: "Fäste PZ-MBG2 Magic", artnr: "50130237", brand: "Vanderbilt", category: "Komponenter", badge: "" },
-{ id: 4, title: "Fäste för överfallskontakt vit", artnr: "50459054", brand: "Ajax Systems", category: "Ajax Systems", badge: "Toppsäljare" },
-{ id: 5, title: "Motstånd 4.7 KOHM", artnr: "50026317", brand: "Övriga", category: "Komponenter", badge: "" },
-{ id: 6, title: "Miljölarm EA200 2 zoner", artnr: "50002569", brand: "Övriga", category: "Komponenter", badge: "" },
-{ id: 7, title: "Extranyckel SP1/ DP2/ DP3 plast", artnr: "50133323", brand: "Teletec", category: "Teletec", badge: "" },
-{ id: 8, title: "Antenn till Hub", artnr: "50001846", brand: "Ajax Systems", category: "Ajax Systems", badge: "" },
-{ id: 9, title: "Logotypskylt för utomhussiren vit", artnr: "50459034", brand: "Ajax Systems", category: "Ajax Systems", badge: "" }
- ];
+    // Testdata
+    const products = [
+        { id: 1, title: "SIM-kort för Ajax centralapparater", artnr: "50003131", brand: "Ajax Systems", category: "Ajax Systems", badge: "Nyhet" },
+        { id: 2, title: "Motstånd 2.2 KOHM", artnr: "10015656", brand: "Övriga", category: "Komponenter", badge: "" },
+        { id: 3, title: "Fäste PZ-MBG2 Magic", artnr: "50130237", brand: "Vanderbilt", category: "Komponenter", badge: "" },
+        { id: 4, title: "Fäste för överfallskontakt vit", artnr: "50459054", brand: "Ajax Systems", category: "Ajax Systems", badge: "Toppsäljare" },
+        { id: 5, title: "Motstånd 4.7 KOHM", artnr: "50026317", brand: "Övriga", category: "Komponenter", badge: "" },
+        { id: 6, title: "Miljölarm EA200 2 zoner", artnr: "50002569", brand: "Övriga", category: "Komponenter", badge: "" },
+        { id: 7, title: "Extranyckel SP1/ DP2/ DP3 plast", artnr: "50133323", brand: "Teletec", category: "Teletec", badge: "" },
+        { id: 8, title: "Antenn till Hub", artnr: "50001846", brand: "Ajax Systems", category: "Ajax Systems", badge: "" },
+        { id: 9, title: "Logotypskylt för utomhussiren vit", artnr: "50459034", brand: "Ajax Systems", category: "Ajax Systems", badge: "" }
+    ];
 
-let currentCategory = "Alla";
-let searchQuery = "";
+    let currentCategory = "Alla";
+    let searchQuery = "";
 
-// Rendera ut produktkorten i galleriet
-function renderProducts() {
-const grid = document.getElementById('productGrid');
-grid.innerHTML = '';
+    // Funktion för att öppna/stänga mappar i trädet
+    function toggleFolder(menuId) {
+        const item = document.getElementById(menuId);
+        item.classList.toggle('expanded');
+    }
 
-// Filtrera baserat på sökning och markerad kategori
-const filtered = products.filter(p => {
-const matchesCategory = currentCategory === "Alla" || p.category === currentCategory;
-const matchesSearch = p.title.toLowerCase().includes(searchQuery) ||
-p.artnr.includes(searchQuery) ||
-p.brand.toLowerCase().includes(searchQuery);
-return matchesCategory && matchesSearch;
-});
+    // Rendera ut produktkorten i galleriet
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
 
-document.getElementById('product-count').innerText = Visar ${filtered.length} produkter;
+        // Filtrera baserat på sökning och markerad kategori
+        const filtered = products.filter(p => {
+            const matchesCategory = currentCategory === "Alla" || p.category === currentCategory;
+            const matchesSearch = p.title.toLowerCase().includes(searchQuery) || 
+                                  p.artnr.includes(searchQuery) || 
+                                  p.brand.toLowerCase().includes(searchQuery);
+            return matchesCategory && matchesSearch;
+        });
 
-if (filtered.length === 0) {
-grid.innerHTML = <div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 16px;"&gt;Inga produkter matchar din sökning.&lt;/div>;
-return;
-}
+        // HÄR fixades texten så den uppdateras korrekt direkt vid start
+        document.getElementById('product-count').innerText = `Visar ${filtered.length} produkter`;
 
-filtered.forEach(p => {
-const card = document.createElement('div');
-card.className = 'product-card';
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 16px;">Inga produkter matchar din sökning.</div>`;
+            return;
+        }
+
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            card.innerHTML = `
+                ${p.badge ? `<span class="badge">${p.badge}</span>` : ''}
+                <div class="product-image">
+                    <span style="font-size: 48px;">📦</span>
+                </div>
+                <div>
+                    <div class="brand">${p.brand}</div>
+                    <div class="title" title="${p.title}">${p.title}</div>
+                    <div class="artnr">Art.nr ${p.artnr}</div>
+                </div>
+                <button class="btn" onclick="openModal(${p.id})">Visa Produktinformation</button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // Sökfunktion (Realtid)
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase();
+        renderProducts();
+    });
+
+    // Kategori-filtrering och hantering av aktiv stil i menyn
+    function filterCategory(category, labelId) {
+        currentCategory = category;
+        
+        // Hindra att klicket även stänger/öppnar mappen om man klickar på en underkategori
+        if(event) {
+            event.stopPropagation();
+        }
+
+        // Återställ aktiv klass på alla etiketter
+        document.querySelectorAll('.tree-label').forEach(item => {
+            item.classList.remove('active');
+        });
+        
+        // Sätt aktiv klass på den klickade etiketten
+        document.getElementById(labelId).classList.add('active');
+
+        renderProducts();
+    }
+
+    // Öppna produktsidan (Modal) med mjuk transition
+    function openModal(id) {
+        const product = products.find(p => p.id === id);
+        if (!product) return;
+
+        document.getElementById('modalBrand').innerText = product.brand;
+        document.getElementById('modalTitle').innerText = product.title;
+        document.getElementById('modalArtnr').innerText = `Art.nr: ${product.artnr}`;
+        document.getElementById('modalDesc').innerText = `Detta är specifik och djupt ingående produktinformation för ${product.title}. Denna text läses in direkt från er genererade JSON-fil och mappar mot den kolumn i er Excel-fil där tekniska specifikationer, mått eller långa beskrivningar finns lagrade.`;
+
+        document.getElementById('productModal').classList.add('open');
+    }
+
+    // Stäng popupen
+    function closeModal() {
+        document.getElementById('productModal').classList.remove('open');
+    }
+
+    // Stäng popupen om användaren klickar på det suddiga bakgrundslagret
+    function closeModalOnOutsideClick(event) {
+        if (event.target.id === 'productModal') {
+            closeModal();
+        }
+    }
+
+    // Kör igång första renderingen när sidan laddas
+    renderProducts();
+</script>
+
+</body>
+</html>

@@ -6,9 +6,9 @@
     <title>Digital Produktkatalog</title>
     <style>
         :root {
-            --primary-color: rgb(88, 197, 202);
-            --primary-dark: rgb(68, 167, 172);
-            --bg-color: #f4f7f9;
+            --primary-color: #004b87; /* Copiax-blå / professionell mörkblå */
+            --accent-color: rgb(88, 197, 202);
+            --bg-color: #f8fafc;
             --card-bg: #ffffff;
             --text-color: #1e293b;
             --text-muted: #64748b;
@@ -25,7 +25,7 @@
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            padding: 30px 20px;
+            padding: 20px;
         }
 
         .container {
@@ -33,15 +33,16 @@
             margin: 0 auto;
         }
 
+        /* Topbar / Header */
         header {
             background: var(--card-bg);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
-            margin-bottom: 30px;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            margin-bottom: 25px;
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         @media (min-width: 768px) {
@@ -53,9 +54,15 @@
         }
 
         .header-title h2 {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
             color: #0f172a;
+        }
+
+        .header-title p {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 2px;
         }
 
         .search-bar {
@@ -66,50 +73,51 @@
 
         .search-bar input {
             width: 100%;
-            padding: 14px 24px;
-            border: 2px solid var(--border-color);
-            border-radius: 50px;
+            padding: 12px 20px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
             font-size: 15px;
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
             outline: none;
-            background: #f8fafc;
+            background: #fff;
         }
 
         .search-bar input:focus {
-            background: #fff;
             border-color: var(--primary-color);
-            box-shadow: 0 0 0 4px rgba(88, 197, 202, 0.15);
+            box-shadow: 0 0 0 3px rgba(0, 75, 135, 0.1);
         }
 
+        /* Layout Grid */
         .main-layout {
             display: grid;
             grid-template-columns: 320px 1fr;
-            gap: 30px;
+            gap: 25px;
         }
 
         @media (max-width: 992px) {
             .main-layout { grid-template-columns: 1fr; }
         }
 
-        /* Dynamiska Filterträdet */
+        /* Filterträd (Vänstersida) */
         .sidebar {
             background: var(--card-bg);
-            padding: 24px;
-            border-radius: 20px;
-            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             height: fit-content;
             max-height: 85vh;
             overflow-y: auto;
         }
 
         .sidebar h3 {
-            font-size: 16px;
+            font-size: 14px;
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
             margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            border-bottom: 1px solid var(--border-color);
+            color: #0f172a;
         }
 
         .tree-menu, .tree-menu ul {
@@ -118,192 +126,207 @@
         }
 
         .tree-item {
-            margin: 4px 0;
+            margin: 2px 0;
         }
 
         .tree-label {
             display: flex;
             align-items: center;
-            padding: 8px 12px;
-            border-radius: 8px;
+            padding: 6px 10px;
+            border-radius: 6px;
             cursor: pointer;
             color: #334155;
             font-weight: 500;
-            font-size: 14px;
+            font-size: 13.5px;
             transition: all 0.15s ease;
         }
 
         .tree-label:hover {
             background: #f1f5f9;
+            color: #000;
         }
 
         .tree-label.active {
-            background: rgba(88, 197, 202, 0.1);
-            color: var(--primary-dark);
+            background: rgba(0, 75, 135, 0.08);
+            color: var(--primary-color);
             font-weight: 600;
         }
 
         .toggle-arrow {
-            margin-right: 8px;
-            font-size: 11px;
+            margin-right: 6px;
+            font-size: 10px;
             transition: transform 0.2s ease;
             display: inline-block;
             width: 12px;
+            color: var(--text-muted);
         }
 
+        /* Gömda undermenyer som standard */
         .sub-menu {
-            padding-left: 16px !important;
+            padding-left: 14px !important;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.25s ease-out;
+            transition: max-height 0.25s cubic-bezier(0, 1, 0, 1);
         }
 
-        .expanded > .sub-menu {
-            max-height: 2000px;
+        /* Expandera undermeny när föräldern har klassen 'expanded' */
+        .tree-item.expanded > .sub-menu {
+            max-height: 3000px; /* Hög nog för att rymma alla undernivåer */
+            transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
         }
 
-        .expanded > .tree-label .toggle-arrow {
+        .tree-item.expanded > .tree-label .toggle-arrow {
             transform: rotate(90deg);
         }
 
-        /* Galleri */
+        /* Produktgalleri (Högersida) */
         .gallery-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 15px;
         }
 
         .product-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 25px;
+            gap: 20px;
         }
 
         @media (max-width: 1300px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
         @media (max-width: 650px) { .product-grid { grid-template-columns: 1fr; } }
 
-        /* Produktkort */
+        /* Stilrena Produktkort (Inspirerat av Copiax rena struktur) */
         .product-card {
             background: var(--card-bg);
-            border-radius: 20px;
-            padding: 24px;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            border: 1px solid #f1f5f9;
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
         .product-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
-            border-color: rgba(88, 197, 202, 0.3);
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.05);
+            border-color: #cbd5e1;
         }
 
         .product-image {
             width: 100%;
             height: 180px;
             background: #f8fafc;
-            border-radius: 14px;
+            border-radius: 6px;
             margin-bottom: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border: 1px solid #f1f5f9;
         }
 
         .brand {
             font-size: 11px;
             text-transform: uppercase;
             font-weight: 700;
-            color: var(--primary-dark);
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
             margin-bottom: 4px;
         }
 
         .title {
-            font-size: 16px;
-            font-weight: 600;
+            font-size: 15px;
+            font-weight: 700;
             color: #0f172a;
             margin-bottom: 4px;
-            line-height: 1.4;
-        }
-
-        .desc-preview {
-            font-size: 13px;
-            color: var(--text-muted);
-            height: 36px;
-            overflow: hidden;
-            margin-bottom: 12px;
+            line-height: 1.3;
+            min-height: 40px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .benamning {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-bottom: 10px;
+            min-height: 34px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
 
         .artnr {
             font-size: 12px;
-            background: #f1f5f9;
-            padding: 4px 10px;
-            border-radius: 6px;
-            display: inline-block;
+            color: var(--text-muted);
             margin-bottom: 15px;
-            font-weight: 500;
         }
 
         .btn {
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 50px;
+            background: transparent;
+            color: var(--primary-color);
+            border: 1.5px solid var(--primary-color);
+            padding: 10px 15px;
+            border-radius: 4px;
             font-weight: 600;
+            font-size: 13.5px;
             cursor: pointer;
             width: 100%;
             transition: all 0.2s ease;
+            text-align: center;
         }
 
-        .btn:hover { background: var(--primary-dark); }
+        .btn:hover {
+            background: var(--primary-color);
+            color: white;
+        }
 
-        /* Popup (Modal) */
+        /* Popup / Modal */
         .modal {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.4);
-            backdrop-filter: blur(8px);
+            backdrop-filter: blur(4px);
             display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none;
-            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            transition: opacity 0.3s ease;
             z-index: 1000;
         }
 
         .modal.open { opacity: 1; pointer-events: auto; }
 
         .modal-content {
-            background: white; padding: 40px; border-radius: 24px;
-            max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto;
-            position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px;
-            transform: translateY(40px) scale(0.95);
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            background: white; padding: 35px; border-radius: 16px;
+            max-width: 850px; width: 95%; max-height: 90vh; overflow-y: auto;
+            position: relative; box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 30px;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
         }
 
-        .modal.open .modal-content { transform: translateY(0) scale(1); }
+        .modal.open .modal-content { transform: scale(1); }
 
-        @media (max-width: 768px) { .modal-content { grid-template-columns: 1fr; gap: 20px; } }
+        @media (max-width: 768px) { .modal-content { grid-template-columns: 1fr; gap: 20px; padding: 20px; } }
 
         .close-modal {
-            position: absolute; top: 20px; right: 20px; font-size: 24px;
+            position: absolute; top: 15px; right: 15px; font-size: 22px;
             cursor: pointer; border: none; background: #f1f5f9;
-            width: 40px; height: 40px; border-radius: 50%;
+            width: 36px; height: 36px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
+            color: var(--text-muted);
         }
 
-        /* Teknisk Specifikation-tabell i popupen */
+        .close-modal:hover { background: #e2e8f0; color: black; }
+
         .spec-table {
-            width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px;
+            width: 100%; border-collapse: collapse; margin-top: 12px; font-size: 13px;
         }
         .spec-table tr { border-bottom: 1px solid #f1f5f9; }
-        .spec-table td { padding: 8px 4px; }
-        .spec-table td:first-child { font-weight: 600; color: #64748b; width: 40%; }
+        .spec-table td { padding: 6px 4px; }
+        .spec-table td:first-child { font-weight: 600; color: #64748b; width: 45%; }
     </style>
 </head>
 <body>
@@ -312,10 +335,10 @@
     <header>
         <div class="header-title">
             <h2>Digital Produktkatalog</h2>
-            <p id="product-count">Läser in artiklar...</p>
+            <p id="product-count">Laddar produkter...</p>
         </div>
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Sök på produkt, benämning, E-nummer, tillverkare...">
+            <input type="text" id="searchInput" placeholder="Sök på produkt, märke, E-nummer eller artikelnummer...">
         </div>
     </header>
 
@@ -336,22 +359,22 @@
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeModal()">&times;</button>
         
-        <div class="modal-image-box" style="background: #f8fafc; border-radius: 16px; display: flex; align-items: center; justify-content: center; height: 300px; border: 1px solid var(--border-color);">
-            <span id="modalImgPlaceholder" style="font-size: 72px;">📦</span>
+        <div style="background: #f8fafc; border-radius: 8px; display: flex; align-items: center; justify-content: center; height: 280px; border: 1px solid var(--border-color);">
+            <span style="font-size: 64px;">📦</span>
         </div>
         
         <div>
-            <span id="modalBrand" class="brand">Tillverkare</span>
-            <h2 id="modalTitle" style="margin: 5px 0 2px 0; font-size: 22px; color: #0f172a;">Produkt</h2>
-            <h3 id="modalSub" style="font-size: 15px; font-weight: 500; color: var(--text-muted); margin-bottom: 15px;">Benämning</h3>
+            <span id="modalBrand" class="brand">Märke</span>
+            <h2 id="modalTitle" style="margin: 5px 0 2px 0; font-size: 20px; color: #0f172a;">Produkt</h2>
+            <h3 id="modalSub" style="font-size: 14px; font-weight: 500; color: var(--text-muted); margin-bottom: 15px;">Benämning</h3>
             
-            <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
-                <h4 style="font-size: 12px; text-transform: uppercase; color: #0f172a;">Beskrivning</h4>
-                <p id="modalDesc" style="color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-top: 5px;"></p>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <h4 style="font-size: 12px; text-transform: uppercase; color: #0f172a; letter-spacing: 0.3px;">Beskrivning</h4>
+                <p id="modalDesc" style="color: var(--text-muted); font-size: 13.5px; line-height: 1.5; margin-top: 4px;"></p>
             </div>
 
-            <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
-                <h4 style="font-size: 12px; text-transform: uppercase; color: #0f172a;">Teknisk Specifikation</h4>
+            <div style="margin-top: 15px; border-top: 1px solid var(--border-color); padding-top: 12px;">
+                <h4 style="font-size: 12px; text-transform: uppercase; color: #0f172a; letter-spacing: 0.3px;">Teknisk Data</h4>
                 <table class="spec-table" id="specTable">
                     </table>
             </div>
@@ -361,16 +384,19 @@
 
 <script>
     let products = [];
-    let activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
+    // Håller koll på vilken nivå och vilket värde vi filtrerar på just nu
+    let currentFilter = { level: 'All', value: null };
     let searchQuery = "";
 
-    // HÄMTA JSON-FILEN FRÅN SHAREPOINT
+    // LÄS IN JSON-FILEN
     function loadData() {
-        // Justera denna URL så den pekar på din genererade produkter.json
         const jsonUrl = "produkter.json"; 
 
         fetch(jsonUrl)
-            .then(res => res.json())
+            .then(res => {
+                if (!res.ok) throw new Error("Kunde inte läsa JSON-filen");
+                return res.json();
+            })
             .then(data => {
                 products = data;
                 buildTree();
@@ -378,68 +404,93 @@
             })
             .catch(err => {
                 console.error(err);
-                document.getElementById('product-count').innerText = "Kunde inte ladda produktdatan.";
+                document.getElementById('product-count').innerText = "Kunde inte läsa in produkter.json. Kontrollera filnamnet.";
             });
     }
 
-    // BYGG TRÄDET AUTOMATISKT UTIFRÅN DATA I EXCEL-FILEN
+    // BYGG FILTERTRÄDET DYNAMISKT FRÅN JSON-FILENS KATEGORIER
     function buildTree() {
         const treeContainer = document.getElementById('dynamicTree');
         treeContainer.innerHTML = '';
 
-        // Lägg till "Visa alla" överst
+        // Skapa översta valet "Visa alla"
         const allLi = document.createElement('li');
         allLi.className = 'tree-item';
         allLi.innerHTML = `<div class="tree-label active" id="btn-all">📁 Visa alla produkter</div>`;
-        allLi.onclick = () => selectFilter('All', null);
+        allLi.onclick = () => selectFilter('All', null, document.getElementById('btn-all'));
         treeContainer.appendChild(allLi);
 
-        // Strukturera data: Huvudkategori -> Kategori -> Underkategori
-        let structure = {};
+        // Skapa en trädstruktur i minnet: Huvudkategori -> Kategori -> Underkategori
+        let treeData = {};
 
         products.forEach(p => {
-            let hk = p.Huvudkategori || "Ospecificerat";
-            let k = p.Kategori || "Ospecificerat";
-            let uk = p.Underkategori || "Ospecificerat";
+            let hk = p.Huvudkategori ? p.Huvudkategori.trim() : "";
+            let k = p.Kategori ? p.Kategori.trim() : "";
+            let uk = p.Underkategori ? p.Underkategori.trim() : "";
 
-            if (!structure[hk]) structure[hk] = {};
-            if (!structure[hk][k]) structure[hk][k] = [];
-            if (!structure[hk][k].includes(uk)) structure[hk][k].push(uk);
+            if (!hk) return; // Hoppa över om det saknas huvudkategori
+
+            if (!treeData[hk]) treeData[hk] = {};
+            if (k) {
+                if (!treeData[hk][k]) treeData[hk][k] = new Set();
+                if (uk) {
+                    treeData[hk][k].add(uk);
+                }
+            }
         });
 
-        // Generera HTML för trädet
-        for (let hk in structure) {
-            let hkLi = document.createElement('li');
-            hkLi.className = 'tree-item';
-            hkLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📂 ${hk}</div>`;
+        // Loopa ut Huvudkategorier (Nivå 1)
+        for (let hk in treeData) {
+            const hkLi = document.createElement('li');
+            hkLi.className = 'tree-item'; // Stängd som standard (saknar klassen 'expanded')
             
-            let hkUl = document.createElement('ul');
+            const hasChildren = Object.keys(treeData[hk]).length > 0;
+            hkLi.innerHTML = `
+                <div class="tree-label">
+                    ${hasChildren ? '<span class="toggle-arrow">►</span>' : '<span class="toggle-arrow" style="visibility:hidden">►</span>'}
+                    <span>📂 ${hk}</span>
+                </div>
+            `;
+
+            const hkUl = document.createElement('ul');
             hkUl.className = 'sub-menu';
 
+            // Klickfunktion för Huvudkategori
             hkLi.querySelector('.tree-label').onclick = (e) => {
                 e.stopPropagation();
-                hkLi.classList.toggle('expanded');
+                if (hasChildren) hkLi.classList.toggle('expanded');
                 selectFilter('Huvudkategori', hk, hkLi.querySelector('.tree-label'));
             };
 
-            for (let k in structure[hk]) {
-                let kLi = document.createElement('li');
+            // Loopa ut Kategorier (Nivå 2)
+            for (let k in treeData[hk]) {
+                const kLi = document.createElement('li');
                 kLi.className = 'tree-item';
-                kLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📁 ${k}</div>`;
                 
-                let kUl = document.createElement('ul');
+                const hasGrandchildren = treeData[hk][k].size > 0;
+                kLi.innerHTML = `
+                    <div class="tree-label">
+                        ${hasGrandchildren ? '<span class="toggle-arrow">►</span>' : '<span class="toggle-arrow" style="visibility:hidden">►</span>'}
+                        <span>📁 ${k}</span>
+                    </div>
+                `;
+
+                const kUl = document.createElement('ul');
                 kUl.className = 'sub-menu';
 
+                // Klickfunktion för Kategori
                 kLi.querySelector('.tree-label').onclick = (e) => {
                     e.stopPropagation();
-                    kLi.classList.toggle('expanded');
+                    if (hasGrandchildren) kLi.classList.toggle('expanded');
                     selectFilter('Kategori', k, kLi.querySelector('.tree-label'));
                 };
 
-                structure[hk][k].forEach(uk => {
-                    let ukLi = document.createElement('li');
+                // Loopa ut Underkategorier (Nivå 3)
+                treeData[hk][k].forEach(uk => {
+                    const ukLi = document.createElement('li');
                     ukLi.className = 'tree-item';
                     ukLi.innerHTML = `<div class="tree-label">🔹 ${uk}</div>`;
+                    
                     ukLi.onclick = (e) => {
                         e.stopPropagation();
                         selectFilter('Underkategori', uk, ukLi.querySelector('.tree-label'));
@@ -456,69 +507,82 @@
         }
     }
 
-    function selectFilter(level, value, element) {
+    // HANTERA FILTERVAL
+    function selectFilter(level, value, labelElement) {
+        // Ta bort aktiv färg från alla rader i trädet
         document.querySelectorAll('.tree-label').forEach(el => el.classList.remove('active'));
         
-        if (level === 'All') {
-            activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
-            document.getElementById('btn-all').classList.add('active');
-        } else if (level === 'Huvudkategori') {
-            activeFilters = { Huvudkategori: value, Kategori: null, Underkategori: null };
-            element.classList.add('active');
-        } else if (level === 'Kategori') {
-            activeFilters = { Huvudkategori: null, Kategori: value, Underkategori: null };
-            element.classList.add('active');
-        } else if (level === 'Underkategori') {
-            activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: value };
-            element.classList.add('active');
+        // Sätt vald rad till aktiv
+        if (labelElement) {
+            labelElement.classList.add('active');
         }
+
+        // Spara filterläge
+        currentFilter.level = level;
+        currentFilter.value = value;
+
         renderProducts();
     }
 
-    // RENDERA ALLA PRODUKTKORT
+    // RENDERA PRODUKTKORTEN
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
 
+        // Filtrera listan baserat på träd och sökning
         let filtered = products.filter(p => {
-            // Filterträd-logik
-            if (activeFilters.Huvudkategori && p.Huvudkategori !== activeFilters.Huvudkategori) return false;
-            if (activeFilters.Kategori && p.Kategori !== activeFilters.Kategori) return false;
-            if (activeFilters.Underkategori && p.Underkategori !== activeFilters.Underkategori) return false;
+            // 1. Trädfiltrering
+            if (currentFilter.level === 'Huvudkategori' && p.Huvudkategori !== currentFilter.value) return false;
+            if (currentFilter.level === 'Kategori' && p.Kategori !== currentFilter.value) return false;
+            if (currentFilter.level === 'Underkategori' && p.Underkategori !== currentFilter.value) return false;
 
-            // Sökfälts-logik
+            // 2. Fritextsökning (Söker brett på flera kolumner)
             if (searchQuery) {
-                let searchStr = `${p.Produkt} ${p.Benämning} ${p["E-nummer"]} ${p.Tillverkare} ${p["Tillverkarens artikellnummer"]}`.toLowerCase();
+                let searchStr = `${p.Produkt} ${p.Benämning} ${p["E-nummer"]} ${p.Tillverkare} ${p["Tillverkarens artikellnummer"]} ${p.Kategori}`.toLowerCase();
                 if (!searchStr.includes(searchQuery)) return false;
             }
             return true;
         });
 
-        document.getElementById('product-count').innerText = `Visar ${filtered.length} av ${products.length} artiklar`;
+        // Uppdatera produktantalsräknaren direkt
+        document.getElementById('product-count').innerText = `Visar ${filtered.length} av ${products.length} produkter`;
 
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 50px; color: var(--text-muted); font-size: 15px;">Inga produkter matchar filtret eller sökningen.</div>`;
+            return;
+        }
+
+        // Rita upp korten
         filtered.forEach(p => {
             const card = document.createElement('div');
             card.className = 'product-card';
+            
+            // Hitta det nummer eller id vi ska visa (Prioritera E-nummer, annars Tillverkarens art.nr)
+            let displayId = p["E-nummer"] ? `E-nr: ${p["E-nummer"]}` : (p["Tillverkarens artikellnummer"] ? `Art.nr: ${p["Tillverkarens artikellnummer"]}` : '');
+
             card.innerHTML = `
                 <div>
+                    <div class="product-image">
+                        <span style="font-size: 44px;">📦</span>
+                    </div>
                     <div class="brand">${p.Tillverkare || 'Övrigt'}</div>
-                    <div class="title">${p.Produkt}</div>
-                    <div class="desc-preview">${p.Benämning || ''}</div>
-                    ${p["E-nummer"] ? `<div class="artnr">E-nr: ${p["E-nummer"]}</div>` : (p["Tillverkarens artikellnummer"] ? `<div class="artnr">Art.nr: ${p["Tillverkarens artikellnummer"]}</div>` : '<div style="height:34px"></div>')}
+                    <div class="title" title="${p.Produkt}">${p.Produkt}</div>
+                    <div class="benamning" title="${p.Benämning || ''}">${p.Benämning || ''}</div>
+                    <div class="artnr">${displayId}</div>
                 </div>
-                <button class="btn" onclick="openModal(${p.rowId})">Visa Produktinformation</button>
+                <button class="btn" onclick="openModal(${p.rowId})">Visa produktinformation</button>
             `;
             grid.appendChild(card);
         });
     }
 
-    // REALTIOSSÖKNING
+    // SÖKFUNKTION (Söker direkt vid varje knapptryck)
     document.getElementById('searchInput').addEventListener('input', (e) => {
         searchQuery = e.target.value.toLowerCase();
         renderProducts();
     });
 
-    // ÖPPNA POPUPEN OCH GENERERA TEKNISK DATA
+    // ÖPPNA POPUP (MODAL) OCH MAPPA TEKNISK SPECIFIKATION
     function openModal(rowId) {
         const p = products.find(prod => prod.rowId === rowId);
         if (!p) return;
@@ -526,26 +590,28 @@
         document.getElementById('modalBrand').innerText = p.Tillverkare || 'Övrigt';
         document.getElementById('modalTitle').innerText = p.Produkt;
         document.getElementById('modalSub').innerText = p.Benämning || '';
-        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig.';
+        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Beskrivning saknas för denna produkt.';
 
-        // Bygg tabellen med övriga kolumner som inte visas på framsidan
+        // Generera tabellen för tekniska specifikationer dynamiskt baserat på ifyllda datafält
         const specTable = document.getElementById('specTable');
         specTable.innerHTML = '';
 
-        const specs = [
-            { label: "E-nummer", val: p["E-nummer"] },
-            { label: "Tillverkarens art.nr", val: p["Tillverkarens artikellnummer"] },
-            { label: "Lev. Artikelnummer", val: p["Lev. Artikelnummer"] },
-            { label: "Sortiment", val: p.Sortiment },
-            { label: "Godkännande", val: p.Godkännande },
-            { label: "Livscykelstatus", val: p.Livscykelstatus },
-            { label: "Ersättande produkt", val: p["Ersättande produkt"] },
-            { label: "Extra information", val: p["Extra information"] }
+        const fields = [
+            { label: "E-nummer", key: "E-nummer" },
+            { label: "Tillverkarens art.nr", key: "Tillverkarens artikellnummer" },
+            { label: "Lev. Artikelnummer", key: "Lev. Artikelnummer" },
+            { label: "Godkännande", key: "Godkännande" },
+            { label: "Sortiment", key: "Sortiment" },
+            { label: "Livscykelstatus", key: "Livscykelstatus" },
+            { label: "Ersättande produkt", key: "Ersättande produkt" },
+            { label: "Huvudkategori", key: "Huvudkategori" },
+            { label: "Kategori", key: "Kategori" },
+            { label: "Underkategori", key: "Underkategori" }
         ];
 
-        specs.forEach(spec => {
-            if (spec.val) {
-                let row = `<tr><td>${spec.label}</td><td>${spec.val}</td></tr>`;
+        fields.forEach(f => {
+            if (p[f.key] && p[f.key].toString().trim() !== "") {
+                let row = `<tr><td>${f.label}</td><td>${p[f.key]}</td></tr>`;
                 specTable.innerHTML += row;
             }
         });
@@ -553,9 +619,11 @@
         document.getElementById('productModal').classList.add('open');
     }
 
-    function closeModal() { document.getElementById('productModal').classList.remove('open'); }
+    function closeModal() {
+        document.getElementById('productModal').classList.remove('open');
+    }
 
-    // Starta laddning
+    // Kör igång scriptet
     loadData();
 </script>
 

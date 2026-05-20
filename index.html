@@ -29,11 +29,10 @@
         }
 
         .container {
-            max-width: 1400px;
+            max-width: 1600px;
             margin: 0 auto;
         }
 
-        /* Header & Sök */
         header {
             background: var(--card-bg);
             padding: 30px;
@@ -59,12 +58,6 @@
             color: #0f172a;
         }
 
-        .header-title p {
-            font-size: 14px;
-            color: var(--text-muted);
-            margin-top: 4px;
-        }
-
         .search-bar {
             position: relative;
             width: 100%;
@@ -88,26 +81,25 @@
             box-shadow: 0 0 0 4px rgba(88, 197, 202, 0.15);
         }
 
-        /* Layout Uppdelning */
         .main-layout {
             display: grid;
-            grid-template-columns: 280px 1fr;
+            grid-template-columns: 320px 1fr;
             gap: 30px;
         }
 
         @media (max-width: 992px) {
-            .main-layout {
-                grid-template-columns: 1fr;
-            }
+            .main-layout { grid-template-columns: 1fr; }
         }
 
-        /* Filterträd / Sidomeny */
+        /* Dynamiska Filterträdet */
         .sidebar {
             background: var(--card-bg);
             padding: 24px;
             border-radius: 20px;
             box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
             height: fit-content;
+            max-height: 85vh;
+            overflow-y: auto;
         }
 
         .sidebar h3 {
@@ -115,34 +107,34 @@
             font-weight: 700;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             padding-bottom: 10px;
             border-bottom: 2px solid #f1f5f9;
         }
 
-        .tree-menu {
+        .tree-menu, .tree-menu ul {
             list-style: none;
+            padding-left: 0;
         }
 
         .tree-item {
-            margin: 6px 0;
-            font-size: 15px;
+            margin: 4px 0;
         }
 
         .tree-label {
             display: flex;
             align-items: center;
-            padding: 10px 14px;
-            border-radius: 10px;
+            padding: 8px 12px;
+            border-radius: 8px;
             cursor: pointer;
             color: #334155;
             font-weight: 500;
-            transition: all 0.2s ease;
+            font-size: 14px;
+            transition: all 0.15s ease;
         }
 
         .tree-label:hover {
             background: #f1f5f9;
-            color: #000;
         }
 
         .tree-label.active {
@@ -151,51 +143,34 @@
             font-weight: 600;
         }
 
-        .tree-icon {
-            margin-right: 10px;
-            font-size: 14px;
+        .toggle-arrow {
+            margin-right: 8px;
+            font-size: 11px;
             transition: transform 0.2s ease;
             display: inline-block;
+            width: 12px;
         }
 
-        /* Kollaps-logik för undermenyn */
         .sub-menu {
-            list-style: none;
-            padding-left: 24px;
-            margin-top: 4px;
+            padding-left: 16px !important;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.3s cubic-bezier(0, 1, 0, 1); /* Mjuk öppning */
+            transition: max-height 0.25s ease-out;
         }
 
-        /* När en meny är expanderad */
-        .tree-item.expanded .sub-menu {
-            max-height: 500px; /* Tillräckligt stor höjd för att rymma underalternativ */
-            transition: max-height 0.3s cubic-bezier(1, 0, 1, 0);
+        .expanded > .sub-menu {
+            max-height: 2000px;
         }
 
-        .tree-item.expanded .toggle-arrow {
-            transform: rotate(90deg); /* Roterar pilen neråt vid öppning */
+        .expanded > .tree-label .toggle-arrow {
+            transform: rotate(90deg);
         }
 
-        /* Produktgalleri (3 Kolumner) */
+        /* Galleri */
         .gallery-container {
             display: flex;
             flex-direction: column;
             gap: 20px;
-        }
-
-        .gallery-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 5px;
-        }
-
-        #product-count {
-            font-size: 15px;
-            font-weight: 600;
-            color: var(--text-muted);
         }
 
         .product-grid {
@@ -204,12 +179,8 @@
             gap: 25px;
         }
 
-        @media (max-width: 1200px) {
-            .product-grid { grid-template-columns: repeat(2, 1fr); }
-        }
-        @media (max-width: 650px) {
-            .product-grid { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 1300px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 650px) { .product-grid { grid-template-columns: 1fr; } }
 
         /* Produktkort */
         .product-card {
@@ -220,9 +191,8 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            position: relative;
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
             border: 1px solid #f1f5f9;
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease;
         }
 
         .product-card:hover {
@@ -231,35 +201,15 @@
             border-color: rgba(88, 197, 202, 0.3);
         }
 
-        .badge {
-            position: absolute;
-            top: 20px;
-            left: 20px;
-            background: var(--primary-color);
-            color: white;
-            padding: 5px 12px;
-            border-radius: 30px;
-            font-size: 11px;
-            font-weight: 700;
-            letter-spacing: 0.5px;
-            z-index: 2;
-            box-shadow: 0 2px 10px rgba(88, 197, 202, 0.2);
-        }
-
         .product-image {
             width: 100%;
-            height: 200px;
+            height: 180px;
             background: #f8fafc;
             border-radius: 14px;
-            margin-bottom: 20px;
+            margin-bottom: 15px;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s ease;
-        }
-
-        .product-card:hover .product-image {
-            background: #f1f5f9;
         }
 
         .brand {
@@ -267,27 +217,36 @@
             text-transform: uppercase;
             font-weight: 700;
             color: var(--primary-dark);
-            letter-spacing: 0.8px;
-            margin-bottom: 6px;
+            margin-bottom: 4px;
         }
 
         .title {
             font-size: 16px;
             font-weight: 600;
             color: #0f172a;
-            margin-bottom: 8px;
+            margin-bottom: 4px;
             line-height: 1.4;
-            height: 44px;
+        }
+
+        .desc-preview {
+            font-size: 13px;
+            color: var(--text-muted);
+            height: 36px;
             overflow: hidden;
+            margin-bottom: 12px;
             display: -webkit-box;
             -webkit-line-clamp: 2;
             -webkit-box-orient: vertical;
         }
 
         .artnr {
-            font-size: 13px;
-            color: var(--text-muted);
-            margin-bottom: 20px;
+            font-size: 12px;
+            background: #f1f5f9;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 500;
         }
 
         .btn {
@@ -297,105 +256,54 @@
             padding: 12px 20px;
             border-radius: 50px;
             font-weight: 600;
-            font-size: 14px;
             cursor: pointer;
             width: 100%;
             transition: all 0.2s ease;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(88, 197, 202, 0.15);
         }
 
-        .btn:hover {
-            background: var(--primary-dark);
-            box-shadow: 0 6px 16px rgba(88, 197, 202, 0.25);
-        }
+        .btn:hover { background: var(--primary-dark); }
 
-        /* Produktsida / Popup (Modal) Bakgrund */
+        /* Popup (Modal) */
         .modal {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(15, 23, 42, 0.4);
             backdrop-filter: blur(8px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            pointer-events: none;
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
             transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             z-index: 1000;
         }
 
-        .modal.open {
-            opacity: 1;
-            pointer-events: auto;
-        }
+        .modal.open { opacity: 1; pointer-events: auto; }
 
         .modal-content {
-            background: white;
-            padding: 40px;
-            border-radius: 24px;
-            max-width: 800px;
-            width: 90%;
-            position: relative;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            display: grid;
-            grid-template-columns: 1.2fr 1fr;
-            gap: 40px;
+            background: white; padding: 40px; border-radius: 24px;
+            max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto;
+            position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px;
             transform: translateY(40px) scale(0.95);
             transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
         }
 
-        .modal.open .modal-content {
-            transform: translateY(0) scale(1);
-        }
+        .modal.open .modal-content { transform: translateY(0) scale(1); }
 
-        @media (max-width: 768px) {
-            .modal-content { 
-                grid-template-columns: 1fr; 
-                padding: 30px 24px; 
-                gap: 24px;
-                max-height: 90vh;
-                overflow-y: auto;
-            }
-        }
+        @media (max-width: 768px) { .modal-content { grid-template-columns: 1fr; gap: 20px; } }
 
         .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 24px;
-            cursor: pointer;
-            border: none;
-            background: #f1f5f9;
-            color: var(--text-muted);
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
-            z-index: 10;
+            position: absolute; top: 20px; right: 20px; font-size: 24px;
+            cursor: pointer; border: none; background: #f1f5f9;
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .close-modal:hover {
-            background: #e2e8f0;
-            color: #0f172a;
-            transform: rotate(90deg);
+        /* Teknisk Specifikation-tabell i popupen */
+        .spec-table {
+            width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px;
         }
-
-        .modal-image-box {
-            background: #f8fafc; 
-            border-radius: 16px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            height: 320px;
-            border: 1px solid var(--border-color);
-        }
+        .spec-table tr { border-bottom: 1px solid #f1f5f9; }
+        .spec-table td { padding: 8px 4px; }
+        .spec-table td:first-child { font-weight: 600; color: #64748b; width: 40%; }
     </style>
 </head>
 <body>
@@ -404,207 +312,251 @@
     <header>
         <div class="header-title">
             <h2>Digital Produktkatalog</h2>
-            <p>Internportal för organisationen</p>
+            <p id="product-count">Läser in artiklar...</p>
         </div>
         <div class="search-bar">
-            <input type="text" id="searchInput" placeholder="Sök bland 50 000 produkter, art.nr eller märke...">
+            <input type="text" id="searchInput" placeholder="Sök på produkt, benämning, E-nummer, tillverkare...">
         </div>
     </header>
 
     <div class="main-layout">
         <aside class="sidebar">
             <h3>Produktgrupper</h3>
-            <ul class="tree-menu">
-                <li class="tree-item">
-                    <div class="tree-label active" id="label-all" onclick="filterCategory('Alla', 'label-all')">
-                        <span class="tree-icon">📁</span> Visa alla
-                    </div>
-                </li>
-                
-                <li class="tree-item" id="menu-inbrott">
-                    <div class="tree-label" onclick="toggleFolder('menu-inbrott')">
-                        <span class="tree-icon toggle-arrow">►</span> <span>📁 Inbrottslarm</span>
-                    </div>
-                    <ul class="sub-menu">
-                        <li class="tree-item">
-                            <div class="tree-label" id="label-ajax" onclick="filterCategory('Ajax Systems', 'label-ajax')">
-                                <span class="tree-icon">🔹</span> Ajax Systems
-                            </div>
-                        </li>
-                        <li class="tree-item">
-                            <div class="tree-label" id="label-teletec" onclick="filterCategory('Teletec', 'label-teletec')">
-                                <span class="tree-icon">🔹</span> Teletec
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-                
-                <li class="tree-item" id="menu-ovrigt">
-                    <div class="tree-label" onclick="toggleFolder('menu-ovrigt')">
-                        <span class="tree-icon toggle-arrow">►</span> <span>📁 Övrigt</span>
-                    </div>
-                    <ul class="sub-menu">
-                        <li class="tree-item">
-                            <div class="tree-label" id="label-comp" onclick="filterCategory('Komponenter', 'label-comp')">
-                                <span class="tree-icon">🔹</span> Komponenter
-                            </div>
-                        </li>
-                    </ul>
-                </li>
-            </ul>
+            <ul class="tree-menu" id="dynamicTree">
+                </ul>
         </aside>
 
         <main class="gallery-container">
-            <div class="gallery-header">
-                <span id="product-count">Visar 0 produkter</span>
-            </div>
-            
-            <div class="product-grid" id="productGrid">
-                </div>
+            <div class="product-grid" id="productGrid"></div>
         </main>
     </div>
 </div>
 
-<div class="modal" id="productModal" onclick="closeModalOnOutsideClick(event)">
+<div class="modal" id="productModal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeModal()">&times;</button>
         
-        <div class="modal-image-box">
-            <span style="font-size: 72px;">📦</span>
+        <div class="modal-image-box" style="background: #f8fafc; border-radius: 16px; display: flex; align-items: center; justify-content: center; height: 300px; border: 1px solid var(--border-color);">
+            <span id="modalImgPlaceholder" style="font-size: 72px;">📦</span>
         </div>
         
-        <div style="display: flex; flex-direction: column; justify-content: center;">
-            <span id="modalBrand" class="brand">Märke</span>
-            <h2 id="modalTitle" style="margin: 10px 0; font-size: 24px; font-weight: 700; color: #0f172a; line-height: 1.3;">Produktnamn</h2>
-            <p id="modalArtnr" class="artnr">Art.nr: -</p>
+        <div>
+            <span id="modalBrand" class="brand">Tillverkare</span>
+            <h2 id="modalTitle" style="margin: 5px 0 2px 0; font-size: 22px; color: #0f172a;">Produkt</h2>
+            <h3 id="modalSub" style="font-size: 15px; font-weight: 500; color: var(--text-muted); margin-bottom: 15px;">Benämning</h3>
             
-            <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 20px;">
-                <h4 style="font-size: 13px; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 10px; color: #0f172a;">Beskrivning</h4>
-                <p id="modalDesc" style="color: var(--text-muted); font-size: 15px; line-height: 1.6;">
-                    Information laddas...
-                </p>
+            <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h4 style="font-size: 12px; text-transform: uppercase; color: #0f172a;">Beskrivning</h4>
+                <p id="modalDesc" style="color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-top: 5px;"></p>
+            </div>
+
+            <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h4 style="font-size: 12px; text-transform: uppercase; color: #0f172a;">Teknisk Specifikation</h4>
+                <table class="spec-table" id="specTable">
+                    </table>
             </div>
         </div>
     </div>
 </div>
 
 <script>
-    // Testdata
-    const products = [
-        { id: 1, title: "SIM-kort för Ajax centralapparater", artnr: "50003131", brand: "Ajax Systems", category: "Ajax Systems", badge: "Nyhet" },
-        { id: 2, title: "Motstånd 2.2 KOHM", artnr: "10015656", brand: "Övriga", category: "Komponenter", badge: "" },
-        { id: 3, title: "Fäste PZ-MBG2 Magic", artnr: "50130237", brand: "Vanderbilt", category: "Komponenter", badge: "" },
-        { id: 4, title: "Fäste för överfallskontakt vit", artnr: "50459054", brand: "Ajax Systems", category: "Ajax Systems", badge: "Toppsäljare" },
-        { id: 5, title: "Motstånd 4.7 KOHM", artnr: "50026317", brand: "Övriga", category: "Komponenter", badge: "" },
-        { id: 6, title: "Miljölarm EA200 2 zoner", artnr: "50002569", brand: "Övriga", category: "Komponenter", badge: "" },
-        { id: 7, title: "Extranyckel SP1/ DP2/ DP3 plast", artnr: "50133323", brand: "Teletec", category: "Teletec", badge: "" },
-        { id: 8, title: "Antenn till Hub", artnr: "50001846", brand: "Ajax Systems", category: "Ajax Systems", badge: "" },
-        { id: 9, title: "Logotypskylt för utomhussiren vit", artnr: "50459034", brand: "Ajax Systems", category: "Ajax Systems", badge: "" }
-    ];
-
-    let currentCategory = "Alla";
+    let products = [];
+    let activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
     let searchQuery = "";
 
-    // Funktion för att öppna/stänga mappar i trädet
-    function toggleFolder(menuId) {
-        const item = document.getElementById(menuId);
-        item.classList.toggle('expanded');
+    // HÄMTA JSON-FILEN FRÅN SHAREPOINT
+    function loadData() {
+        // Justera denna URL så den pekar på din genererade produkter.json
+        const jsonUrl = "produkter.json"; 
+
+        fetch(jsonUrl)
+            .then(res => res.json())
+            .then(data => {
+                products = data;
+                buildTree();
+                renderProducts();
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('product-count').innerText = "Kunde inte ladda produktdatan.";
+            });
     }
 
-    // Rendera ut produktkorten i galleriet
+    // BYGG TRÄDET AUTOMATISKT UTIFRÅN DATA I EXCEL-FILEN
+    function buildTree() {
+        const treeContainer = document.getElementById('dynamicTree');
+        treeContainer.innerHTML = '';
+
+        // Lägg till "Visa alla" överst
+        const allLi = document.createElement('li');
+        allLi.className = 'tree-item';
+        allLi.innerHTML = `<div class="tree-label active" id="btn-all">📁 Visa alla produkter</div>`;
+        allLi.onclick = () => selectFilter('All', null);
+        treeContainer.appendChild(allLi);
+
+        // Strukturera data: Huvudkategori -> Kategori -> Underkategori
+        let structure = {};
+
+        products.forEach(p => {
+            let hk = p.Huvudkategori || "Ospecificerat";
+            let k = p.Kategori || "Ospecificerat";
+            let uk = p.Underkategori || "Ospecificerat";
+
+            if (!structure[hk]) structure[hk] = {};
+            if (!structure[hk][k]) structure[hk][k] = [];
+            if (!structure[hk][k].includes(uk)) structure[hk][k].push(uk);
+        });
+
+        // Generera HTML för trädet
+        for (let hk in structure) {
+            let hkLi = document.createElement('li');
+            hkLi.className = 'tree-item';
+            hkLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📂 ${hk}</div>`;
+            
+            let hkUl = document.createElement('ul');
+            hkUl.className = 'sub-menu';
+
+            hkLi.querySelector('.tree-label').onclick = (e) => {
+                e.stopPropagation();
+                hkLi.classList.toggle('expanded');
+                selectFilter('Huvudkategori', hk, hkLi.querySelector('.tree-label'));
+            };
+
+            for (let k in structure[hk]) {
+                let kLi = document.createElement('li');
+                kLi.className = 'tree-item';
+                kLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📁 ${k}</div>`;
+                
+                let kUl = document.createElement('ul');
+                kUl.className = 'sub-menu';
+
+                kLi.querySelector('.tree-label').onclick = (e) => {
+                    e.stopPropagation();
+                    kLi.classList.toggle('expanded');
+                    selectFilter('Kategori', k, kLi.querySelector('.tree-label'));
+                };
+
+                structure[hk][k].forEach(uk => {
+                    let ukLi = document.createElement('li');
+                    ukLi.className = 'tree-item';
+                    ukLi.innerHTML = `<div class="tree-label">🔹 ${uk}</div>`;
+                    ukLi.onclick = (e) => {
+                        e.stopPropagation();
+                        selectFilter('Underkategori', uk, ukLi.querySelector('.tree-label'));
+                    };
+                    kUl.appendChild(ukLi);
+                });
+
+                kLi.appendChild(kUl);
+                hkUl.appendChild(kLi);
+            }
+
+            hkLi.appendChild(hkUl);
+            treeContainer.appendChild(hkLi);
+        }
+    }
+
+    function selectFilter(level, value, element) {
+        document.querySelectorAll('.tree-label').forEach(el => el.classList.remove('active'));
+        
+        if (level === 'All') {
+            activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
+            document.getElementById('btn-all').classList.add('active');
+        } else if (level === 'Huvudkategori') {
+            activeFilters = { Huvudkategori: value, Kategori: null, Underkategori: null };
+            element.classList.add('active');
+        } else if (level === 'Kategori') {
+            activeFilters = { Huvudkategori: null, Kategori: value, Underkategori: null };
+            element.classList.add('active');
+        } else if (level === 'Underkategori') {
+            activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: value };
+            element.classList.add('active');
+        }
+        renderProducts();
+    }
+
+    // RENDERA ALLA PRODUKTKORT
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
 
-        // Filtrera baserat på sökning och markerad kategori
-        const filtered = products.filter(p => {
-            const matchesCategory = currentCategory === "Alla" || p.category === currentCategory;
-            const matchesSearch = p.title.toLowerCase().includes(searchQuery) || 
-                                  p.artnr.includes(searchQuery) || 
-                                  p.brand.toLowerCase().includes(searchQuery);
-            return matchesCategory && matchesSearch;
+        let filtered = products.filter(p => {
+            // Filterträd-logik
+            if (activeFilters.Huvudkategori && p.Huvudkategori !== activeFilters.Huvudkategori) return false;
+            if (activeFilters.Kategori && p.Kategori !== activeFilters.Kategori) return false;
+            if (activeFilters.Underkategori && p.Underkategori !== activeFilters.Underkategori) return false;
+
+            // Sökfälts-logik
+            if (searchQuery) {
+                let searchStr = `${p.Produkt} ${p.Benämning} ${p["E-nummer"]} ${p.Tillverkare} ${p["Tillverkarens artikellnummer"]}`.toLowerCase();
+                if (!searchStr.includes(searchQuery)) return false;
+            }
+            return true;
         });
 
-        // HÄR fixades texten så den uppdateras korrekt direkt vid start
-        document.getElementById('product-count').innerText = `Visar ${filtered.length} produkter`;
-
-        if (filtered.length === 0) {
-            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 16px;">Inga produkter matchar din sökning.</div>`;
-            return;
-        }
+        document.getElementById('product-count').innerText = `Visar ${filtered.length} av ${products.length} artiklar`;
 
         filtered.forEach(p => {
             const card = document.createElement('div');
             card.className = 'product-card';
             card.innerHTML = `
-                ${p.badge ? `<span class="badge">${p.badge}</span>` : ''}
-                <div class="product-image">
-                    <span style="font-size: 48px;">📦</span>
-                </div>
                 <div>
-                    <div class="brand">${p.brand}</div>
-                    <div class="title" title="${p.title}">${p.title}</div>
-                    <div class="artnr">Art.nr ${p.artnr}</div>
+                    <div class="brand">${p.Tillverkare || 'Övrigt'}</div>
+                    <div class="title">${p.Produkt}</div>
+                    <div class="desc-preview">${p.Benämning || ''}</div>
+                    ${p["E-nummer"] ? `<div class="artnr">E-nr: ${p["E-nummer"]}</div>` : (p["Tillverkarens artikellnummer"] ? `<div class="artnr">Art.nr: ${p["Tillverkarens artikellnummer"]}</div>` : '<div style="height:34px"></div>')}
                 </div>
-                <button class="btn" onclick="openModal(${p.id})">Visa Produktinformation</button>
+                <button class="btn" onclick="openModal(${p.rowId})">Visa Produktinformation</button>
             `;
             grid.appendChild(card);
         });
     }
 
-    // Sökfunktion (Realtid)
+    // REALTIOSSÖKNING
     document.getElementById('searchInput').addEventListener('input', (e) => {
         searchQuery = e.target.value.toLowerCase();
         renderProducts();
     });
 
-    // Kategori-filtrering och hantering av aktiv stil i menyn
-    function filterCategory(category, labelId) {
-        currentCategory = category;
-        
-        // Hindra att klicket även stänger/öppnar mappen om man klickar på en underkategori
-        if(event) {
-            event.stopPropagation();
-        }
+    // ÖPPNA POPUPEN OCH GENERERA TEKNISK DATA
+    function openModal(rowId) {
+        const p = products.find(prod => prod.rowId === rowId);
+        if (!p) return;
 
-        // Återställ aktiv klass på alla etiketter
-        document.querySelectorAll('.tree-label').forEach(item => {
-            item.classList.remove('active');
+        document.getElementById('modalBrand').innerText = p.Tillverkare || 'Övrigt';
+        document.getElementById('modalTitle').innerText = p.Produkt;
+        document.getElementById('modalSub').innerText = p.Benämning || '';
+        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig.';
+
+        // Bygg tabellen med övriga kolumner som inte visas på framsidan
+        const specTable = document.getElementById('specTable');
+        specTable.innerHTML = '';
+
+        const specs = [
+            { label: "E-nummer", val: p["E-nummer"] },
+            { label: "Tillverkarens art.nr", val: p["Tillverkarens artikellnummer"] },
+            { label: "Lev. Artikelnummer", val: p["Lev. Artikelnummer"] },
+            { label: "Sortiment", val: p.Sortiment },
+            { label: "Godkännande", val: p.Godkännande },
+            { label: "Livscykelstatus", val: p.Livscykelstatus },
+            { label: "Ersättande produkt", val: p["Ersättande produkt"] },
+            { label: "Extra information", val: p["Extra information"] }
+        ];
+
+        specs.forEach(spec => {
+            if (spec.val) {
+                let row = `<tr><td>${spec.label}</td><td>${spec.val}</td></tr>`;
+                specTable.innerHTML += row;
+            }
         });
-        
-        // Sätt aktiv klass på den klickade etiketten
-        document.getElementById(labelId).classList.add('active');
-
-        renderProducts();
-    }
-
-    // Öppna produktsidan (Modal) med mjuk transition
-    function openModal(id) {
-        const product = products.find(p => p.id === id);
-        if (!product) return;
-
-        document.getElementById('modalBrand').innerText = product.brand;
-        document.getElementById('modalTitle').innerText = product.title;
-        document.getElementById('modalArtnr').innerText = `Art.nr: ${product.artnr}`;
-        document.getElementById('modalDesc').innerText = `Detta är specifik och djupt ingående produktinformation för ${product.title}. Denna text läses in direkt från er genererade JSON-fil och mappar mot den kolumn i er Excel-fil där tekniska specifikationer, mått eller långa beskrivningar finns lagrade.`;
 
         document.getElementById('productModal').classList.add('open');
     }
 
-    // Stäng popupen
-    function closeModal() {
-        document.getElementById('productModal').classList.remove('open');
-    }
+    function closeModal() { document.getElementById('productModal').classList.remove('open'); }
 
-    // Stäng popupen om användaren klickar på det suddiga bakgrundslagret
-    function closeModalOnOutsideClick(event) {
-        if (event.target.id === 'productModal') {
-            closeModal();
-        }
-    }
-
-    // Kör igång första renderingen när sidan laddas
-    renderProducts();
+    // Starta laddning
+    loadData();
 </script>
 
 </body>

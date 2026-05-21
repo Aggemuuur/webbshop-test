@@ -240,7 +240,6 @@
             font-weight: 600;
         }
 
-        /* Nyckelbricka för aktivt filter (Visuell indikation på förval) */
         .dropdown-trigger.has-value {
             border-color: var(--primary-color);
             color: var(--primary-color);
@@ -466,7 +465,8 @@
             -webkit-box-orient: vertical;
         }
 
-        .artnr {
+        /* Bricka för att visa sortimentstillhörighet */
+        .sortiment-badge {
             font-size: 12px;
             background: var(--input-bg);
             color: var(--text-color);
@@ -476,6 +476,7 @@
             margin-bottom: 15px;
             font-weight: 500;
             border: 1px solid var(--border-color);
+            text-transform: capitalize;
         }
 
         .btn {
@@ -610,7 +611,6 @@
     let products = [];
     let searchQuery = "";
     
-    // NYHET: "Primärsortiment" är nu satt som standard direkt vid start
     let activeFilters = { 
         Huvudkategori: null, Kategori: null, Underkategori: null,
         Tillverkare: null, Leverantör: null, Sortiment: "Primärsortiment", Godkännande: null
@@ -737,7 +737,7 @@
         rowBox.appendChild(clearBtn);
     }
 
-    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN (Med färgmarkering för aktiva val)
+    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN
     function renderSingleDropdownOptions(field) {
         const safeId = field.key.replace(/[^a-zA-Z0-9]/g, '_');
         const listEl = document.getElementById(`options-${safeId}`);
@@ -756,7 +756,6 @@
 
         listEl.innerHTML = '';
 
-        // Skapa standardvalet "Visa Alla"
         const allOpt = document.createElement('li');
         allOpt.className = `dropdown-option ${!activeFilters[field.key] ? 'selected' : ''}`;
         allOpt.textContent = field.label;
@@ -769,7 +768,6 @@
         };
         listEl.appendChild(allOpt);
 
-        // Skapa listan med valen
         values.forEach(val => {
             const opt = document.createElement('li');
             const isSelected = activeFilters[field.key] === val;
@@ -787,7 +785,6 @@
             listEl.appendChild(opt);
         });
 
-        // Uppdatera knappens utseende och text om den har ett aktivt värde (t.ex. Primärsortiment)
         if (activeFilters[field.key]) {
             triggerEl.textContent = activeFilters[field.key];
             triggerEl.classList.add('has-value');
@@ -916,7 +913,7 @@
         }
     }
 
-    // 6. RENDERA PRODUKTKORT
+    // 6. RENDERA PRODUKTKORT (ÄNDRAD: Visar Sortiment istället för E-nr/Art.nr)
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
@@ -933,14 +930,9 @@
             const card = document.createElement('div');
             card.className = 'product-card';
             
-            let idLabel = "";
-            if (p["E-nummer"]) {
-                idLabel = `<div class="artnr">E-nr: ${p["E-nummer"]}</div>`;
-            } else if (p["Tillverkarens artikellnummer"]) {
-                idLabel = `<div class="artnr">Art.nr: ${p["Tillverkarens artikellnummer"]}</div>`;
-            } else {
-                idLabel = `<div style="height:34px"></div>`;
-            }
+            // Hämta sortimentets värde, eller sätt till "Övrigt sortiment" om fältet saknas i JSON
+            let sortimentText = p.Sortiment && p.Sortiment.trim() !== "" ? p.Sortiment.trim() : "Övrigt sortiment";
+            let sortimentLabel = `<div class="sortiment-badge">${sortimentText}</div>`;
 
             let bildSrc = p.Produktbild && p.Produktbild.trim() !== "" ? p.Produktbild.trim() : "";
             let bildHtml = bildSrc ? `<img src="${bildSrc}" alt="${p.Produkt || ''}">` : `<span style="font-size: 48px;">📦</span>`;
@@ -953,7 +945,7 @@
                     <div class="brand">${p.Tillverkare || 'Övrigt'}</div>
                     <div class="title" title="${p.Produkt || ''}">${p.Produkt || 'Namnlös produkt'}</div>
                     <div class="desc-preview">${p.Benämning || ''}</div>
-                    ${idLabel}
+                    ${sortimentLabel}
                 </div>
                 <button class="btn" onclick="openModal(${p.rowId})">Visa Produktinformation</button>
             `;
@@ -991,7 +983,7 @@
         renderProducts();
     }
 
-    // POPUP / MODAL-HANTERING
+    // POPUP / MODAL-HANTERING (E-nummer och specifikationer finns fortfarande kvar här inne)
     function openModal(rowId) {
         const p = products.find(prod => prod.rowId === rowId);
         if (!p) return;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Produktkatalog</title>
+    <title>Produktkatalog</title>
     <style>
         /* Färgteman */
         :root {
@@ -18,6 +18,8 @@
             --input-bg: #f8fafc;
             --tree-hover: #f1f5f9;
             --tree-active-bg: rgba(88, 197, 202, 0.1);
+            --danger-color: #ef4444;
+            --danger-hover: #dc2626;
         }
 
         [data-theme="dark"] {
@@ -30,6 +32,8 @@
             --input-bg: #2d2d2d;
             --tree-hover: #2d2d2d;
             --tree-active-bg: rgba(88, 197, 202, 0.15);
+            --danger-color: #f87171;
+            --danger-hover: #ef4444;
         }
 
         * {
@@ -119,19 +123,20 @@
             box-shadow: 0 0 0 4px rgba(88, 197, 202, 0.15);
         }
 
-        /* Ny filterrad i headern */
+        /* Filterrad */
         .filter-row {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
             gap: 12px;
             width: 100%;
             border-top: 1px solid var(--border-color);
             padding-top: 15px;
+            align-items: center;
         }
 
         .filter-select {
             width: 100%;
-            padding: 10px 16px;
+            padding: 10px 14px;
             border: 1px solid var(--border-color);
             border-radius: 10px;
             background-color: var(--input-bg);
@@ -140,11 +145,30 @@
             font-weight: 500;
             outline: none;
             cursor: pointer;
-            transition: border-color 0.2s ease;
         }
 
         .filter-select:focus {
             border-color: var(--primary-color);
+        }
+
+        /* Knapp för att rensa filter */
+        .clear-btn {
+            background: transparent;
+            border: 1px solid var(--danger-color);
+            color: var(--danger-color);
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            text-align: center;
+            white-space: nowrap;
+        }
+
+        .clear-btn:hover {
+            background: var(--danger-color);
+            color: white;
         }
 
         .theme-toggle-btn {
@@ -178,7 +202,7 @@
             .main-layout { grid-template-columns: 1fr; }
         }
 
-        /* Filterträd / Sidomeny */
+        /* Filterträd */
         .sidebar {
             background: var(--card-bg);
             padding: 24px;
@@ -446,12 +470,13 @@
 
         <div class="filter-row">
             <select id="filter-Tillverkare" class="filter-select"><option value="">Alla Tillverkare</option></select>
-            <select id="filter-Lev-Artikelnummer" class="filter-select"><option value="">Alla Leverantörer</option></select>
+            <select id="filter-Leverantör" class="filter-select"><option value="">Alla Leverantörer</option></select>
             <select id="filter-Sortiment" class="filter-select"><option value="">Alla Sortiment</option></select>
             <select id="filter-Huvudkategori" class="filter-select"><option value="">Alla Huvudkategorier</option></select>
             <select id="filter-Kategori" class="filter-select"><option value="">Alla Kategorier</option></select>
             <select id="filter-Underkategori" class="filter-select"><option value="">Alla Underkategorier</option></select>
             <select id="filter-Godkännande" class="filter-select"><option value="">Alla Godkännanden</option></select>
+            <button class="clear-btn" onclick="resetAllFilters()">❌ Rensa filter</button>
         </div>
     </header>
 
@@ -495,19 +520,31 @@
 
 <script>
     let products = [];
-    // Utökat filter-objekt för att hålla koll på alla valda parametrar globalt
+    let searchQuery = "";
+    
+    // Globala filterinställningar
     let activeFilters = { 
         Huvudkategori: null, 
         Kategori: null, 
         Underkategori: null,
         Tillverkare: null,
-        "Lev. Artikelnummer": null,
+        Leverantör: null,
         Sortiment: null,
         Godkännande: null
     };
-    let searchQuery = "";
 
-    // FUNKTION FÖR ATT VÄXLA THEME (DARK / LIGHT)
+    // Definitioner för våra dropdowns
+    const dropdownFields = [
+        { id: "filter-Tillverkare", key: "Tillverkare", label: "Alla Tillverkare" },
+        { id: "filter-Leverantör", key: "Leverantör", label: "Alla Leverantörer" }, // KORRIGERAD: Nu mappad mot "Leverantör"
+        { id: "filter-Sortiment", key: "Sortiment", label: "Alla Sortiment" },
+        { id: "filter-Huvudkategori", key: "Huvudkategori", label: "Alla Huvudkategorier" },
+        { id: "filter-Kategori", key: "Kategori", label: "Alla Kategorier" },
+        { id: "filter-Underkategori", key: "Underkategori", label: "Alla Underkategorier" },
+        { id: "filter-Godkännande", key: "Godkännande", label: "Alla Godkännanden" }
+    ];
+
+    // THEME HANDLING
     const toggleBtn = document.getElementById('themeToggleBtn');
     const currentTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', currentTheme);
@@ -526,13 +563,13 @@
         }
     });
 
-    // 1. HÄMTA JSON-FILEN
+    // 1. HÄMTA DATAN
     function loadData() {
         const jsonUrl = "produkter.json"; 
 
         fetch(jsonUrl)
             .then(res => {
-                if (!res.ok) throw new Error("Kunde inte hitta eller läsa produkter.json");
+                if (!res.ok) throw new Error("Kunde inte läsa produkter.json");
                 return res.json();
             })
             .then(data => {
@@ -540,9 +577,11 @@
                     item.rowId = index + 1;
                     return item;
                 });
-                buildTree();
-                populateDropdowns(); // Bygg dropdown-alternativen utifrån datan
-                renderProducts();
+                
+                // Initiera lyssnare på alla dropdowns en gång
+                initDropdownListeners();
+                // Uppdatera hela gränssnittet
+                updateUI();
             })
             .catch(err => {
                 console.error(err);
@@ -550,125 +589,172 @@
             });
     }
 
-    // 2. FYLL DROPDOWNS DYNAMISKT BASERAT PÅ UNIKA VÄRDEN I JSON
-    function populateDropdowns() {
-        const fields = [
-            { id: "filter-Tillverkare", key: "Tillverkare", label: "Alla Tillverkare" },
-            { id: "filter-Lev-Artikelnummer", key: "Lev. Artikelnummer", label: "Alla Leverantörer" },
-            { id: "filter-Sortiment", key: "Sortiment", label: "Alla Sortiment" },
-            { id: "filter-Huvudkategori", key: "Huvudkategori", label: "Alla Huvudkategorier" },
-            { id: "filter-Kategori", key: "Kategori", label: "Alla Kategorier" },
-            { id: "filter-Underkategori", key: "Underkategori", label: "Alla Underkategorier" },
-            { id: "filter-Godkännande", key: "Godkännande", label: "Alla Godkännanden" }
-        ];
+    // 2. FILTRERINGSMOTOR (Hämtar de produkter som matchar nuvarande filter)
+    function getFilteredProducts(ignoreKey = null) {
+        return products.filter(p => {
+            // Om ignoreKey är satt hoppar vi över just den specifika valideringen (används för dynamiska listor)
+            if (ignoreKey !== "Huvudkategori" && activeFilters.Huvudkategori && (p.Huvudkategori || "Ospecificerat").trim() !== activeFilters.Huvudkategori) return false;
+            if (ignoreKey !== "Kategori" && activeFilters.Kategori && (p.Kategori || "Ospecificerat").trim() !== activeFilters.Kategori) return false;
+            if (ignoreKey !== "Underkategori" && activeFilters.Underkategori && (p.Underkategori || "Ospecificerat").trim() !== activeFilters.Underkategori) return false;
+            if (ignoreKey !== "Tillverkare" && activeFilters.Tillverkare && (p.Tillverkare || "").trim() !== activeFilters.Tillverkare) return false;
+            if (ignoreKey !== "Leverantör" && activeFilters.Leverantör && (p.Leverantör || "").trim() !== activeFilters.Leverantör) return false;
+            if (ignoreKey !== "Sortiment" && activeFilters.Sortiment && (p.Sortiment || "").trim() !== activeFilters.Sortiment) return false;
+            if (ignoreKey !== "Godkännande" && activeFilters.Godkännande && (p.Godkännande || "").trim() !== activeFilters.Godkännande) return false;
 
-        fields.forEach(field => {
+            if (searchQuery) {
+                let searchStr = `${p.Produkt} ${p.Benämning} ${p["E-nummer"]} ${p.Tillverkare} ${p["Tillverkarens artikellnummer"]}`.toLowerCase();
+                if (!searchStr.includes(searchQuery)) return false;
+            }
+            return true;
+        });
+    }
+
+    // 3. MATA OCH UPPDATERA ALLA DROPDOWNS DYNAMISKT
+    function updateDropdownOptions() {
+        dropdownFields.forEach(field => {
             const selectEl = document.getElementById(field.id);
             if (!selectEl) return;
 
-            // Hitta unika värden och sortera dem i bokstavsordning
-            let uniqueValues = [...new Set(products.map(p => p[field.key] ? p[field.key].toString().trim() : ""))];
-            uniqueValues = uniqueValues.filter(val => val !== ""); // Ta bort tomma rader
+            // Spara nuvarande val för denna dropdown
+            const currentSelection = activeFilters[field.key] || "";
+
+            // Hämta tillgängliga produkter baserat på alla ANDRA filter utom detta
+            const availableProducts = getFilteredProducts(field.key);
+
+            // Plocka ut unika levande värden
+            let uniqueValues = [...new Set(availableProducts.map(p => p[field.key] ? p[field.key].toString().trim() : ""))];
+            uniqueValues = uniqueValues.filter(val => val !== "");
             uniqueValues.sort((a, b) => a.localeCompare(b, 'sv'));
 
-            // Återställ rullistan med standardalternativet
+            // Töm och bygg om
             selectEl.innerHTML = `<option value="">${field.label}</option>`;
-            
             uniqueValues.forEach(val => {
                 let opt = document.createElement('option');
                 opt.value = val;
                 opt.textContent = val;
+                if (val === currentSelection) opt.selected = true;
                 selectEl.appendChild(opt);
-            });
-
-            // Lyssna på när användaren ändrar i rullistan
-            selectEl.addEventListener('change', (e) => {
-                let val = e.target.value || null;
-                activeFilters[field.key] = val;
-
-                // Om vi ändrar kategori-dropdowns, uppdaterar vi även visuella markeringen i filterträdet
-                if (["Huvudkategori", "Kategori", "Underkategori"].includes(field.key)) {
-                    updateTreeSelection();
-                }
-
-                renderProducts();
             });
         });
     }
 
-    // Synkronisera filterträdets markering om man väljer via dropdowns istället
-    function updateTreeSelection() {
-        document.querySelectorAll('.tree-label').forEach(el => el.classList.remove('active'));
-        if (!activeFilters.Huvudkategori && !activeFilters.Kategori && !activeFilters.Underkategori) {
-            const btnAll = document.getElementById('btn-all');
-            if (btnAll) btnAll.classList.add('active');
-        }
+    // Starta eventlyssnare på rullistorna
+    function initDropdownListeners() {
+        dropdownFields.forEach(field => {
+            const selectEl = document.getElementById(field.id);
+            if (!selectEl) return;
+
+            selectEl.addEventListener('change', (e) => {
+                activeFilters[field.key] = e.target.value || null;
+                updateUI();
+            });
+        });
     }
 
-    // 3. BYGG FILTERTRÄDET AUTOMATISKT
-    function buildTree() {
+    // 4. DYNAMISKT FILTERTRÄD (Ritas om så att bara aktuella grenar syns)
+    function buildDynamicTree() {
         const treeContainer = document.getElementById('dynamicTree');
         treeContainer.innerHTML = '';
 
+        // Skapa "Visa alla produkter"-knappen
         const allLi = document.createElement('li');
         allLi.className = 'tree-item';
-        allLi.innerHTML = `<div class="tree-label active" id="btn-all">📁 Visa alla produkter</div>`;
-        allLi.onclick = () => selectFilter('All', null);
+        const isAllActive = !activeFilters.Huvudkategori && !activeFilters.Kategori && !activeFilters.Underkategori;
+        allLi.innerHTML = `<div class="tree-label ${isAllActive ? 'active' : ''}" id="btn-all">📁 Visa alla produkter</div>`;
+        allLi.onclick = () => {
+            activeFilters.Huvudkategori = null;
+            activeFilters.Kategori = null;
+            activeFilters.Underkategori = null;
+            syncCategoryDropdowns();
+            updateUI();
+        };
         treeContainer.appendChild(allLi);
 
+        // Hämta produkter som klarar de "yttre" filtren (Tillverkare, Leverantör, etc.)
+        const currentPool = products.filter(p => {
+            if (activeFilters.Tillverkare && (p.Tillverkare || "").trim() !== activeFilters.Tillverkare) return false;
+            if (activeFilters.Leverantör && (p.Leverantör || "").trim() !== activeFilters.Leverantör) return false;
+            if (activeFilters.Sortiment && (p.Sortiment || "").trim() !== activeFilters.Sortiment) return false;
+            if (activeFilters.Godkännande && (p.Godkännande || "").trim() !== activeFilters.Godkännande) return false;
+            if (searchQuery) {
+                let searchStr = `${p.Produkt} ${p.Benämning} ${p["E-nummer"]} ${p.Tillverkare} ${p["Tillverkarens artikellnummer"]}`.toLowerCase();
+                if (!searchStr.includes(searchQuery)) return false;
+            }
+            return true;
+        });
+
         let structure = {};
-
-        products.forEach(p => {
-            let hk = p.Huvudkategori ? p.Huvudkategori.trim() : "";
-            let k = p.Kategori ? p.Kategori.trim() : "";
-            let uk = p.Underkategori ? p.Underkategori.trim() : "";
-
-            if (!hk && !k && !uk) return;
-            
-            if (!hk) hk = "Ospecificerat";
-            if (!k) k = "Ospecificerat";
-            if (!uk) uk = "Ospecificerat";
+        currentPool.forEach(p => {
+            let hk = p.Huvudkategori ? p.Huvudkategori.trim() : "Ospecificerat";
+            let k = p.Kategori ? p.Kategori.trim() : "Ospecificerat";
+            let uk = p.Underkategori ? p.Underkategori.trim() : "Ospecificerat";
 
             if (!structure[hk]) structure[hk] = {};
             if (!structure[hk][k]) structure[hk][k] = [];
             if (!structure[hk][k].includes(uk)) structure[hk][k].push(uk);
         });
 
+        // Loopa och bygg HTML
         for (let hk in structure) {
             let hkLi = document.createElement('li');
             hkLi.className = 'tree-item';
-            hkLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📂 ${hk}</div>`;
+            
+            // Kolla om denna gren är aktiv
+            const hkActive = activeFilters.Huvudkategori === hk && !activeFilters.Kategori && !activeFilters.Underkategori;
+            const hkExpanded = activeFilters.Huvudkategori === hk;
+            
+            if (hkExpanded) hkLi.classList.add('expanded');
+
+            hkLi.innerHTML = `<div class="tree-label ${hkActive ? 'active' : ''}"><span class="toggle-arrow">►</span> 📂 ${hk}</div>`;
             
             let hkUl = document.createElement('ul');
             hkUl.className = 'sub-menu';
 
             hkLi.querySelector('.tree-label').onclick = (e) => {
                 e.stopPropagation();
-                hkLi.classList.toggle('expanded');
-                selectFilter('Huvudkategori', hk, hkLi.querySelector('.tree-label'));
+                activeFilters.Huvudkategori = activeFilters.Huvudkategori === hk && hkActive ? null : hk;
+                activeFilters.Kategori = null;
+                activeFilters.Underkategori = null;
+                syncCategoryDropdowns();
+                updateUI();
             };
 
             for (let k in structure[hk]) {
                 let kLi = document.createElement('li');
                 kLi.className = 'tree-item';
-                kLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📁 ${k}</div>`;
+                
+                const kActive = activeFilters.Huvudkategori === hk && activeFilters.Kategori === k && !activeFilters.Underkategori;
+                const kExpanded = activeFilters.Huvudkategori === hk && activeFilters.Kategori === k;
+
+                if (kExpanded) kLi.classList.add('expanded');
+
+                kLi.innerHTML = `<div class="tree-label ${kActive ? 'active' : ''}"><span class="toggle-arrow">►</span> 📁 ${k}</div>`;
                 
                 let kUl = document.createElement('ul');
                 kUl.className = 'sub-menu';
 
                 kLi.querySelector('.tree-label').onclick = (e) => {
                     e.stopPropagation();
-                    kLi.classList.toggle('expanded');
-                    selectFilter('Kategori', k, kLi.querySelector('.tree-label'));
+                    activeFilters.Huvudkategori = hk;
+                    activeFilters.Kategori = activeFilters.Kategori === k && kActive ? null : k;
+                    activeFilters.Underkategori = null;
+                    syncCategoryDropdowns();
+                    updateUI();
                 };
 
                 structure[hk][k].forEach(uk => {
                     let ukLi = document.createElement('li');
                     ukLi.className = 'tree-item';
-                    ukLi.innerHTML = `<div class="tree-label">🔹 ${uk}</div>`;
+                    const ukActive = activeFilters.Huvudkategori === hk && activeFilters.Kategori === k && activeFilters.Underkategori === uk;
+
+                    ukLi.innerHTML = `<div class="tree-label ${ukActive ? 'active' : ''}">🔹 ${uk}</div>`;
                     ukLi.onclick = (e) => {
                         e.stopPropagation();
-                        selectFilter('Underkategori', uk, ukLi.querySelector('.tree-label'));
+                        activeFilters.Huvudkategori = hk;
+                        activeFilters.Kategori = k;
+                        activeFilters.Underkategori = uk;
+                        syncCategoryDropdowns();
+                        updateUI();
                     };
                     kUl.appendChild(ukLi);
                 });
@@ -682,53 +768,19 @@
         }
     }
 
-    // 4. HANTERA FILTERMARKERINGAR (TRÄDET)
-    function selectFilter(level, value, element) {
-        document.querySelectorAll('.tree-label').forEach(el => el.classList.remove('active'));
-        
-        // Återställ kategori-dropdowns och filtervärden
-        if (level === 'All') {
-            activeFilters.Huvudkategori = null;
-            activeFilters.Kategori = null;
-            activeFilters.Underkategori = null;
-            document.getElementById('btn-all').classList.add('active');
-        } else {
-            activeFilters.Huvudkategori = null;
-            activeFilters.Kategori = null;
-            activeFilters.Underkategori = null;
-            activeFilters[level] = value;
-            if (element) element.classList.add('active');
-        }
-
-        // Synka rullisterna i headern så att de matchar klicket i trädet
+    // Synkronisera värdena till rullisterna i headern när man klickar i trädet
+    function syncCategoryDropdowns() {
         document.getElementById('filter-Huvudkategori').value = activeFilters.Huvudkategori || "";
         document.getElementById('filter-Kategori').value = activeFilters.Kategori || "";
         document.getElementById('filter-Underkategori').value = activeFilters.Underkategori || "";
-
-        renderProducts();
     }
 
-    // 5. RENDERA OCH VISA PRODUKTKORTEN
+    // 5. RENDERA PRODUKTKORT
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
 
-        let filtered = products.filter(p => {
-            // Kontrollera mot alla aktiva filter i vårt utökade objekt
-            if (activeFilters.Huvudkategori && (p.Huvudkategori || "Ospecificerat").trim() !== activeFilters.Huvudkategori) return false;
-            if (activeFilters.Kategori && (p.Kategori || "Ospecificerat").trim() !== activeFilters.Kategori) return false;
-            if (activeFilters.Underkategori && (p.Underkategori || "Ospecificerat").trim() !== activeFilters.Underkategori) return false;
-            if (activeFilters.Tillverkare && (p.Tillverkare || "").trim() !== activeFilters.Tillverkare) return false;
-            if (activeFilters["Lev. Artikelnummer"] && (p["Lev. Artikelnummer"] || "").trim() !== activeFilters["Lev. Artikelnummer"]) return false;
-            if (activeFilters.Sortiment && (p.Sortiment || "").trim() !== activeFilters.Sortiment) return false;
-            if (activeFilters.Godkännande && (p.Godkännande || "").trim() !== activeFilters.Godkännande) return false;
-
-            if (searchQuery) {
-                let searchStr = `${p.Produkt} ${p.Benämning} ${p["E-nummer"]} ${p.Tillverkare} ${p["Tillverkarens artikellnummer"]}`.toLowerCase();
-                if (!searchStr.includes(searchQuery)) return false;
-            }
-            return true;
-        });
+        const filtered = getFilteredProducts();
 
         document.getElementById('product-count').innerText = `Visar ${filtered.length} av ${products.length} artiklar`;
 
@@ -769,13 +821,33 @@
         });
     }
 
-    // 6. REALTIDSSÖKNING I SÖKFÄLTET
+    // REALTIDSSÖKNING
     document.getElementById('searchInput').addEventListener('input', (e) => {
         searchQuery = e.target.value.toLowerCase();
-        renderProducts();
+        updateUI();
     });
 
-    // 7. ÖPPNA POPUPEN
+    // 6. KNAPP FÖR ATT NOLLSTÄLLA ALLT
+    function resetAllFilters() {
+        searchQuery = "";
+        document.getElementById('searchInput').value = "";
+        
+        activeFilters = { 
+            Huvudkategori: null, Kategori: null, Underkategori: null,
+            Tillverkare: null, Leverantör: null, Sortiment: null, Godkännande: null
+        };
+        
+        updateUI();
+    }
+
+    // 7. HUVUDFUNKTION FÖR ATT UPPDATERA HELA GRÄNSSNITTET SAMTIDIGT
+    function updateUI() {
+        updateDropdownOptions(); // Gör rullistorna dynamiska/smarta
+        buildDynamicTree();      // Uppdaterar filterträdet dynamiskt
+        renderProducts();        // Visar rätt produkter i galleriet
+    }
+
+    // POPUP / MODAL-HANTERING
     function openModal(rowId) {
         const p = products.find(prod => prod.rowId === rowId);
         if (!p) return;
@@ -783,7 +855,7 @@
         document.getElementById('modalBrand').innerText = p.Tillverkare || 'Övrigt';
         document.getElementById('modalTitle').innerText = p.Produkt || 'Namnlös produkt';
         document.getElementById('modalSub').innerText = p.Benämning || '';
-        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig for denna artikel.';
+        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig för denna artikel.';
 
         const imgBox = document.getElementById('modalImageBox');
         if (p.Produktbild && p.Produktbild.trim() !== "") {
@@ -798,6 +870,7 @@
         const specs = [
             { label: "E-nummer", val: p["E-nummer"] },
             { label: "Tillverkarens art.nr", val: p["Tillverkarens artikellnummer"] },
+            { label: "Leverantör", val: p.Leverantör }, // Korrekt benämning i modalen
             { label: "Lev. Artikelnummer", val: p["Lev. Artikelnummer"] },
             { label: "Sortiment", val: p.Sortiment },
             { label: "Godkännande", val: p.Godkännande },
@@ -820,6 +893,7 @@
         document.getElementById('productModal').classList.remove('open'); 
     }
 
+    // Kör igång applikationen
     loadData();
 </script>
 

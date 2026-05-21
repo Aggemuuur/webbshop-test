@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="sv" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Digital Produktkatalog</title>
+    <style>
+        /* Färgteman - Light mode som standard, Dark mode hämtat från bilden */
+        :root {
+            --primary-color: rgb(88, 197, 202);
+            --primary-dark: rgb(68, 167, 172);
+            --bg-color: #f4f7f9;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+            --text-title: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --input-bg: #f8fafc;
+            --tree-hover: #f1f5f9;
+            --tree-active-bg: rgba(88, 197, 202, 0.1);
+        }
+
+        [data-theme="dark"] {
+            --bg-color: #1a1a1a;
+            --card-bg: #242424;
+            --text-color: #bbbbbb;
+            --text-title: #ffffff;
+            --text-muted: #888888;
+            --border-color: #333333;
+            --input-bg: #2d2d2d;
+            --tree-hover: #2d2d2d;
+            --tree-active-bg: rgba(88, 197, 202, 0.15);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            padding: 30px 20px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        /* Header & Sök */
+        header {
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
+            margin-bottom: 30px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            position: relative;
+        }
+
+        @media (min-width: 768px) {
+            header {
+                flex-direction: row;
+                justify-content: space-between;
+                align-items: center;
+            }
+        }
+
+        .header-title h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--text-title);
+        }
+
+        .header-title p {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .header-controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            width: 100%;
+            max-width: 600px;
+            justify-content: flex-end;
+        }
+
+        .search-bar {
+            position: relative;
+            width: 100%;
+        }
+
+        .search-bar input {
+            width: 100%;
+            padding: 14px 24px;
+            border: 2px solid var(--border-color);
+            border-radius: 50px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+            background: var(--input-bg);
+            color: var(--text-title);
+        }
+
+        .search-bar input:focus {
+            background: var(--card-bg);
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 4px rgba(88, 197, 202, 0.15);
+        }
+
+        /* Dark Mode Toggle-knapp */
+        .theme-toggle-btn {
+            background: var(--input-bg);
+            border: 2px solid var(--border-color);
+            color: var(--text-title);
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            transition: all 0.3s ease;
+            flex-shrink: 0;
+        }
+        
+        .theme-toggle-btn:hover {
+            border-color: var(--primary-color);
+            transform: scale(1.05);
+        }
+
+        /* Layout */
+        .main-layout {
+            display: grid;
+            grid-template-columns: 320px 1fr;
+            gap: 30px;
+        }
+
+        @media (max-width: 992px) {
+            .main-layout { grid-template-columns: 1fr; }
+        }
+
+        /* Filterträd / Sidomeny */
+        .sidebar {
+            background: var(--card-bg);
+            padding: 24px;
+            border-radius: 20px;
+            box-shadow: 0 4px 25px rgba(0, 0, 0, 0.02);
+            height: fit-content;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+        }
+
+        .sidebar h3 {
+            font-size: 16px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid var(--border-color);
+            color: var(--text-title);
+        }
+
+        .tree-menu, .tree-menu ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .tree-item {
+            margin: 4px 0;
+        }
+
+        .tree-label {
+            display: flex;
+            align-items: center;
+            padding: 8px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-color);
+            font-weight: 500;
+            font-size: 14px;
+            transition: all 0.15s ease;
+        }
+
+        .tree-label:hover {
+            background: var(--tree-hover);
+        }
+
+        .tree-label.active {
+            background: var(--tree-active-bg);
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .toggle-arrow {
+            margin-right: 8px;
+            font-size: 11px;
+            transition: transform 0.2s ease;
+            display: inline-block;
+            width: 12px;
+            text-align: center;
+        }
+
+        .sub-menu {
+            padding-left: 16px !important;
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.25s ease-out;
+        }
+
+        .expanded > .sub-menu {
+            max-height: 2500px;
+        }
+
+        .expanded > .tree-label .toggle-arrow {
+            transform: rotate(90deg);
+        }
+
+        /* Galleri */
+        .gallery-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+        }
+
+        @media (max-width: 1300px) { .product-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 650px) { .product-grid { grid-template-columns: 1fr; } }
+
+        /* Produktkort */
+        .product-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 24px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.02);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            border: 1px solid var(--border-color);
+            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
+        }
+
+        .product-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            border-color: rgba(88, 197, 202, 0.4);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 180px;
+            background: var(--input-bg);
+            border-radius: 14px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s ease;
+        }
+
+        .product-card:hover .product-image {
+            background: var(--tree-hover);
+        }
+
+        .brand {
+            font-size: 11px;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: var(--primary-color);
+            letter-spacing: 0.5px;
+            margin-bottom: 4px;
+        }
+
+        .title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-title);
+            margin-bottom: 4px;
+            line-height: 1.4;
+            height: 44px;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .desc-preview {
+            font-size: 13px;
+            color: var(--text-muted);
+            height: 36px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .artnr {
+            font-size: 12px;
+            background: var(--input-bg);
+            color: var(--text-color);
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            margin-bottom: 15px;
+            font-weight: 500;
+            border: 1px solid var(--border-color);
+        }
+
+        .btn {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(88, 197, 202, 0.15);
+        }
+
+        .btn:hover {
+            background: var(--primary-dark);
+            box-shadow: 0 6px 16px rgba(88, 197, 202, 0.25);
+        }
+
+        /* Popup (Modal) */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(8px);
+            display: flex; align-items: center; justify-content: center;
+            opacity: 0; pointer-events: none;
+            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 1000;
+        }
+
+        .modal.open { opacity: 1; pointer-events: auto; }
+
+        .modal-content {
+            background: var(--card-bg); 
+            color: var(--text-color);
+            padding: 40px; border-radius: 24px;
+            max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto;
+            position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px;
+            transform: translateY(40px) scale(0.95);
+            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
+            border: 1px solid var(--border-color);
+        }
+
+        .modal.open .modal-content { transform: translateY(0) scale(1); }
+
+        @media (max-width: 768px) {
+            .modal-content { 
+                grid-template-columns: 1fr; 
+                padding: 30px 24px; 
+                gap: 24px;
+            }
+        }
+
+        .close-modal {
+            position: absolute; top: 20px; right: 20px; font-size: 24px;
+            cursor: pointer; border: none; background: var(--input-bg); color: var(--text-muted);
+            width: 40px; height: 40px; border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; z-index: 10;
+            border: 1px solid var(--border-color);
+        }
+
+        .close-modal:hover { background: var(--tree-hover); color: var(--text-title); transform: rotate(90deg); }
+
+        /* Teknisk Specifikation-tabell */
+        .spec-table {
+            width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px;
+        }
+        .spec-table tr { border-bottom: 1px solid var(--border-color); }
+        .spec-table td { padding: 8px 4px; color: var(--text-color); }
+        .spec-table td:first-child { font-weight: 600; color: var(--text-muted); width: 40%; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <div class="header-title">
+            <h2>Digital Produktkatalog</h2>
+            <p id="product-count">Läser in artiklar...</p>
+        </div>
+        <div class="header-controls">
+            <div class="search-bar">
+                <input type="text" id="searchInput" placeholder="Sök på produkt, benämning, E-nummer, tillverkare...">
+            </div>
+            <button class="theme-toggle-btn" id="themeToggleBtn" title="Ändra färgtema">🌙</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <h3>Produktgrupper</h3>
+            <ul class="tree-menu" id="dynamicTree"></ul>
+        </aside>
+
+        <main class="gallery-container">
+            <div class="product-grid" id="productGrid"></div>
+        </main>
+    </div>
+</div>
+
+<div class="modal" id="productModal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <button class="close-modal" onclick="closeModal()">&times;</button>
+        
+        <div style="background: var(--input-bg); border-radius: 16px; display: flex; align-items: center; justify-content: center; height: 320px; border: 1px solid var(--border-color);">
+            <span style="font-size: 72px;">📦</span>
+        </div>
+        
+        <div style="display: flex; flex-direction: column; justify-content: center;">
+            <span id="modalBrand" class="brand">Tillverkare</span>
+            <h2 id="modalTitle" style="margin: 5px 0 2px 0; font-size: 22px; color: var(--text-title);">Produkt</h2>
+            <h3 id="modalSub" style="font-size: 15px; font-weight: 500; color: var(--text-muted); margin-bottom: 15px;">Benämning</h3>
+            
+            <div style="border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h4 style="font-size: 12px; text-transform: uppercase; color: var(--text-title); letter-spacing: 0.5px;">Beskrivning</h4>
+                <p id="modalDesc" style="color: var(--text-muted); font-size: 14px; line-height: 1.5; margin-top: 5px;"></p>
+            </div>
+
+            <div style="margin-top: 20px; border-top: 1px solid var(--border-color); padding-top: 15px;">
+                <h4 style="font-size: 12px; text-transform: uppercase; color: var(--text-title); letter-spacing: 0.5px;">Teknisk Specifikation</h4>
+                <table class="spec-table" id="specTable"></table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    let products = [];
+    let activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
+    let searchQuery = "";
+
+    // FUNKTION FÖR ATT VÄXLA THEME (DARK / LIGHT)
+    const toggleBtn = document.getElementById('themeToggleBtn');
+    
+    // Kolla om användaren har sparat ett val tidigare, annars välj mörkt tema som standard från bilden
+    const currentTheme = localStorage.getItem('theme') || 'dark';
+    document.documentElement.setAttribute('data-theme', currentTheme);
+    toggleBtn.innerText = currentTheme === 'dark' ? '☀️' : '🌙';
+
+    toggleBtn.addEventListener('click', () => {
+        let theme = document.documentElement.getAttribute('data-theme');
+        if (theme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'light');
+            toggleBtn.innerText = '🌙';
+            localStorage.setItem('theme', 'light');
+        } else {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            toggleBtn.innerText = '☀️';
+            localStorage.setItem('theme', 'dark');
+        }
+    });
+
+    // 1. HÄMTA JSON-FILEN SOM LIGGER I SAMMA MAPP PÅ GITHUB
+    function loadData() {
+        const jsonUrl = "produkter.json"; 
+
+        fetch(jsonUrl)
+            .then(res => {
+                if (!res.ok) throw new Error("Kunde inte hitta eller läsa produkter.json");
+                return res.json();
+            })
+            .then(data => {
+                products = data.map((item, index) => {
+                    item.rowId = index + 1;
+                    return item;
+                });
+                buildTree();
+                renderProducts();
+            })
+            .catch(err => {
+                console.error(err);
+                document.getElementById('product-count').innerText = "Kunde inte ladda produktdatan. Se till att 'produkter.json' ligger korrekt.";
+            });
+    }
+
+    // 2. BYGG FILTERTRÄDET AUTOMATISKT
+    function buildTree() {
+        const treeContainer = document.getElementById('dynamicTree');
+        treeContainer.innerHTML = '';
+
+        const allLi = document.createElement('li');
+        allLi.className = 'tree-item';
+        allLi.innerHTML = `<div class="tree-label active" id="btn-all">📁 Visa alla produkter</div>`;
+        allLi.onclick = () => selectFilter('All', null);
+        treeContainer.appendChild(allLi);
+
+        let structure = {};
+
+        products.forEach(p => {
+            let hk = p.Huvudkategori ? p.Huvudkategori.trim() : "";
+            let k = p.Kategori ? p.Kategori.trim() : "";
+            let uk = p.Underkategori ? p.Underkategori.trim() : "";
+
+            if (!hk && !k && !uk) return;
+            
+            if (!hk) hk = "Ospecificerat";
+            if (!k) k = "Ospecificerat";
+            if (!uk) uk = "Ospecificerat";
+
+            if (!structure[hk]) structure[hk] = {};
+            if (!structure[hk][k]) structure[hk][k] = [];
+            if (!structure[hk][k].includes(uk)) structure[hk][k].push(uk);
+        });
+
+        for (let hk in structure) {
+            let hkLi = document.createElement('li');
+            hkLi.className = 'tree-item';
+            hkLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📂 ${hk}</div>`;
+            
+            let hkUl = document.createElement('ul');
+            hkUl.className = 'sub-menu';
+
+            hkLi.querySelector('.tree-label').onclick = (e) => {
+                e.stopPropagation();
+                hkLi.classList.toggle('expanded');
+                selectFilter('Huvudkategori', hk, hkLi.querySelector('.tree-label'));
+            };
+
+            for (let k in structure[hk]) {
+                let kLi = document.createElement('li');
+                kLi.className = 'tree-item';
+                kLi.innerHTML = `<div class="tree-label"><span class="toggle-arrow">►</span> 📁 ${k}</div>`;
+                
+                let kUl = document.createElement('ul');
+                kUl.className = 'sub-menu';
+
+                kLi.querySelector('.tree-label').onclick = (e) => {
+                    e.stopPropagation();
+                    kLi.classList.toggle('expanded');
+                    selectFilter('Kategori', k, kLi.querySelector('.tree-label'));
+                };
+
+                structure[hk][k].forEach(uk => {
+                    let ukLi = document.createElement('li');
+                    ukLi.className = 'tree-item';
+                    ukLi.innerHTML = `<div class="tree-label">🔹 ${uk}</div>`;
+                    ukLi.onclick = (e) => {
+                        e.stopPropagation();
+                        selectFilter('Underkategori', uk, ukLi.querySelector('.tree-label'));
+                    };
+                    kUl.appendChild(ukLi);
+                });
+
+                kLi.appendChild(kUl);
+                hkUl.appendChild(kLi);
+            }
+
+            hkLi.appendChild(hkUl);
+            treeContainer.appendChild(hkLi);
+        }
+    }
+
+    // 3. HANTERA FILTERMARKERINGAR
+    function selectFilter(level, value, element) {
+        document.querySelectorAll('.tree-label').forEach(el => el.classList.remove('active'));
+        
+        if (level === 'All') {
+            activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
+            document.getElementById('btn-all').classList.add('active');
+        } else {
+            activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
+            activeFilters[level] = value;
+            if (element) element.classList.add('active');
+        }
+        renderProducts();
+    }
+
+    // 4. RENDERA OCH VISA PRODUKTKORTEN
+    function renderProducts() {
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
+
+        let filtered = products.filter(p => {
+            if (activeFilters.Huvudkategori && (p.Huvudkategori || "Ospecificerat").trim() !== activeFilters.Huvudkategori) return false;
+            if (activeFilters.Kategori && (p.Kategori || "Ospecificerat").trim() !== activeFilters.Kategori) return false;
+            if (activeFilters.Underkategori && (p.Underkategori || "Ospecificerat").trim() !== activeFilters.Underkategori) return false;
+
+            if (searchQuery) {
+                let searchStr = `${p.Produkt} ${p.Benämning} ${p["E-nummer"]} ${p.Tillverkare} ${p["Tillverkarens artikellnummer"]}`.toLowerCase();
+                if (!searchStr.includes(searchQuery)) return false;
+            }
+            return true;
+        });
+
+        document.getElementById('product-count').innerText = `Visar ${filtered.length} av ${products.length} artiklar`;
+
+        if (filtered.length === 0) {
+            grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 16px;">Inga produkter matchar valt filter eller sökning.</div>`;
+            return;
+        }
+
+        filtered.forEach(p => {
+            const card = document.createElement('div');
+            card.className = 'product-card';
+            
+            let idLabel = "";
+            if (p["E-nummer"]) {
+                idLabel = `<div class="artnr">E-nr: ${p["E-nummer"]}</div>`;
+            } else if (p["Tillverkarens artikellnummer"]) {
+                idLabel = `<div class="artnr">Art.nr: ${p["Tillverkarens artikellnummer"]}</div>`;
+            } else {
+                idLabel = `<div style="height:34px"></div>`;
+            }
+
+            card.innerHTML = `
+                <div>
+                    <div class="brand">${p.Tillverkare || 'Övrigt'}</div>
+                    <div class="title" title="${p.Produkt || ''}">${p.Produkt || 'Namnlös produkt'}</div>
+                    <div class="desc-preview">${p.Benämning || ''}</div>
+                    ${idLabel}
+                </div>
+                <button class="btn" onclick="openModal(${p.rowId})">Visa Produktinformation</button>
+            `;
+            grid.appendChild(card);
+        });
+    }
+
+    // 5. REALTIDSSÖKNING I SÖKFÄLTET
+    document.getElementById('searchInput').addEventListener('input', (e) => {
+        searchQuery = e.target.value.toLowerCase();
+        renderProducts();
+    });
+
+    // 6. ÖPPNA POPUPEN
+    function openModal(rowId) {
+        const p = products.find(prod => prod.rowId === rowId);
+        if (!p) return;
+
+        document.getElementById('modalBrand').innerText = p.Tillverkare || 'Övrigt';
+        document.getElementById('modalTitle').innerText = p.Produkt || 'Namnlös produkt';
+        document.getElementById('modalSub').innerText = p.Benämning || '';
+        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig for denna artikel.';
+
+        const specTable = document.getElementById('specTable');
+        specTable.innerHTML = '';
+
+        const specs = [
+            { label: "E-nummer", val: p["E-nummer"] },
+            { label: "Tillverkarens art.nr", val: p["Tillverkarens artikellnummer"] },
+            { label: "Lev. Artikelnummer", val: p["Lev. Artikelnummer"] },
+            { label: "Sortiment", val: p.Sortiment },
+            { label: "Godkännande", val: p.Godkännande },
+            { label: "Livscykelstatus", val: p.Livscykelstatus },
+            { label: "Ersättande produkt", val: p["Ersättande produkt"] },
+            { label: "Extra information", val: p["Extra information"] }
+        ];
+
+        specs.forEach(spec => {
+            if (spec.val && spec.val.toString().trim() !== "") {
+                let row = `<tr><td>${spec.label}</td><td>${spec.val}</td></tr>`;
+                specTable.innerHTML += row;
+            }
+        });
+
+        document.getElementById('productModal').classList.add('open');
+    }
+
+    function closeModal() { 
+        document.getElementById('productModal').classList.remove('open'); 
+    }
+
+    loadData();
+</script>
+
+</body>
+</html>

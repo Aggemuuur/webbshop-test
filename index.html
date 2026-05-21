@@ -262,7 +262,7 @@
             font-weight: 600;
         }
 
-        /* Knapp för att rensa filter */
+        /* Knapp för att rensa filter (Mindre och mer kompakt bredd) */
         .clear-btn {
             display: none; /* Styrs helt via JS */
             background: transparent;
@@ -739,7 +739,6 @@
     function buildDropdownHTML() {
         const rowBox = document.getElementById('filterRowBox');
         rowBox.innerHTML = '';
-        const fragment = document.createDocumentFragment();
 
         dropdownFields.forEach(field => {
             const wrap = document.createElement('div');
@@ -760,8 +759,6 @@
                 closeAllDropdownMenus();
                 if (!isActive) {
                     wrap.classList.add('active');
-                    // OPTIMERING: Rendera bara alternativen för JUST DENNA dropdown när den öppnas!
-                    renderSingleDropdownOptions(field);
                     wrap.querySelector('.dropdown-search-input').focus();
                 }
             });
@@ -771,7 +768,7 @@
                 renderSingleDropdownOptions(field); 
             });
 
-            fragment.appendChild(wrap);
+            rowBox.appendChild(wrap);
         });
 
         const clearBtn = document.createElement('button');
@@ -779,12 +776,10 @@
         clearBtn.id = 'clearFilterBtn';
         clearBtn.innerHTML = '❌ Rensa filter';
         clearBtn.onclick = resetAllFilters;
-        fragment.appendChild(clearBtn);
-
-        rowBox.appendChild(fragment);
+        rowBox.appendChild(clearBtn);
     }
 
-    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN (Körs nu enbart vid klick/sök)
+    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN (Sorterad från A-Ö)
     function renderSingleDropdownOptions(field) {
         const safeId = field.key.replace(/[^a-zA-Z0-9]/g, '_');
         const listEl = document.getElementById(`options-${safeId}`);
@@ -802,7 +797,7 @@
             values = values.filter(v => v.toLowerCase().includes(localQuery));
         }
 
-        const fragment = document.createDocumentFragment();
+        listEl.innerHTML = '';
 
         const allOpt = document.createElement('li');
         allOpt.className = `dropdown-option ${!activeFilters[field.key] ? 'selected' : ''}`;
@@ -814,7 +809,7 @@
             closeAllDropdownMenus();
             updateUI();
         };
-        fragment.appendChild(allOpt);
+        listEl.appendChild(allOpt);
 
         values.forEach(val => {
             const opt = document.createElement('li');
@@ -830,28 +825,20 @@
                 closeAllDropdownMenus();
                 updateUI();
             };
-            fragment.appendChild(opt);
+            listEl.appendChild(opt);
         });
 
-        listEl.innerHTML = '';
-        listEl.appendChild(fragment);
+        if (activeFilters[field.key]) {
+            triggerEl.textContent = activeFilters[field.key];
+            triggerEl.classList.add('has-value');
+        } else {
+            triggerEl.textContent = field.label;
+            triggerEl.classList.remove('has-value');
+        }
     }
 
-    // Uppdaterar bara texterna på knapparna utan att generera listorna i onödan
-    function syncDropdownTriggerLabels() {
-        dropdownFields.forEach(field => {
-            const safeId = field.key.replace(/[^a-zA-Z0-9]/g, '_');
-            const triggerEl = document.getElementById(`trigger-${safeId}`);
-            if (!triggerEl) return;
-
-            if (activeFilters[field.key]) {
-                triggerEl.textContent = activeFilters[field.key];
-                triggerEl.classList.add('has-value');
-            } else {
-                triggerEl.textContent = field.label;
-                triggerEl.classList.remove('has-value');
-            }
-        });
+    function updateAllDropdownOptions() {
+        dropdownFields.forEach(field => renderSingleDropdownOptions(field));
     }
 
     function closeAllDropdownMenus() {
@@ -862,10 +849,10 @@
         document.addEventListener('click', () => closeAllDropdownMenus());
     }
 
-    // 5. DYNAMISKT FILTERTRÄD (Prestandaoptimerat via fragment)
+    // 5. DYNAMISKT FILTERTRÄD (Sorterat från A-Ö)
     function buildDynamicTree() {
         const treeContainer = document.getElementById('dynamicTree');
-        const fragment = document.createDocumentFragment();
+        treeContainer.innerHTML = '';
 
         const allLi = document.createElement('li');
         allLi.className = 'tree-item';
@@ -877,7 +864,7 @@
             activeFilters.Underkategori = null;
             updateUI();
         };
-        fragment.appendChild(allLi);
+        treeContainer.appendChild(allLi);
 
         const currentPool = products.filter(p => {
             if (activeFilters.Tillverkare && (p.Tillverkare || "").trim() !== activeFilters.Tillverkare) return false;
@@ -971,11 +958,8 @@
             });
 
             hkLi.appendChild(hkUl);
-            fragment.appendChild(hkLi);
+            treeContainer.appendChild(hkLi);
         });
-
-        treeContainer.innerHTML = '';
-        treeContainer.appendChild(fragment);
     }
 
     // 5b. STYR SYNLIGHETEN FÖR "RENSA FILTER"-KNAPPEN
@@ -983,6 +967,7 @@
         const clearBtn = document.getElementById('clearFilterBtn');
         if (!clearBtn) return;
 
+        // Knappen ska alltid synas om NÅGOT filter överhuvudtaget är valt (inklusive det förvalda sortimentet)
         const hasAnyActiveFilter = Object.values(activeFilters).some(val => val !== null);
         const hasSearchQuery = searchQuery.trim().length > 0;
 
@@ -993,9 +978,11 @@
         }
     }
 
-    // 6. RENDERA PRODUKTKORT (Prestandaoptimerat via fragment)
+    // 6. RENDERA PRODUKTKORT
     function renderProducts() {
         const grid = document.getElementById('productGrid');
+        grid.innerHTML = '';
+
         const filtered = getFilteredProducts();
         document.getElementById('product-count').innerText = `Visar ${filtered.length} av ${products.length} artiklar`;
 
@@ -1003,8 +990,6 @@
             grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; padding: 40px; color: var(--text-muted); font-size: 16px;">Inga produkter matchar valda filter eller sökning.</div>`;
             return;
         }
-
-        const fragment = document.createDocumentFragment();
 
         filtered.forEach(p => {
             const card = document.createElement('div');
@@ -1037,11 +1022,8 @@
                 </div>
                 <button class="btn" onclick="openModal(${p.rowId})">Visa Produktinformation</button>
             `;
-            fragment.appendChild(card);
+            grid.appendChild(card);
         });
-
-        grid.innerHTML = '';
-        grid.appendChild(fragment);
     }
 
     document.getElementById('searchInput').addEventListener('input', (e) => {
@@ -1049,7 +1031,7 @@
         updateUI();
     });
 
-    // 7. NOLLSTÄLL ALLA FILTER (Extremt snabb nu!)
+    // 7. NOLLSTÄLL ALLA FILTER (Rensar absolut allt och sätter ALLA filter till null)
     function resetAllFilters() {
         searchQuery = "";
         document.getElementById('searchInput').value = "";
@@ -1063,19 +1045,15 @@
             dropdownSearchQueries[field.key] = "";
             const inputEl = document.getElementById(`search-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}`);
             if (inputEl) inputEl.value = "";
-            
-            // Töm de gamla listorna i bakgrunden så att de måste återskapas fräscha nästa gång man klickar
-            const listEl = document.getElementById(`options-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}`);
-            if (listEl) listEl.innerHTML = '';
         });
         
         updateUI();
     }
 
     function updateUI() {
-        syncDropdownTriggerLabels(); // Synkar bara knapptexterna (går direkt!)
-        buildDynamicTree();          // Bygger trädet blixtsnabbt
-        renderProducts();            // Visar korten
+        updateAllDropdownOptions();
+        buildDynamicTree();
+        renderProducts();
         handleClearButtonVisibility(); 
     }
 
@@ -1087,7 +1065,7 @@
         document.getElementById('modalBrand').innerText = p.Tillverkare || 'Övrigt';
         document.getElementById('modalTitle').innerText = p.Produkt || 'Namnlös produkt';
         document.getElementById('modalSub').innerText = p.Benämning || '';
-        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig för denna artikel.';
+        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgånglig för denna artikel.';
 
         const imgBox = document.getElementById('modalImageBox');
         if (p.Produktbild && p.Produktbild.trim() !== "") {
@@ -1111,13 +1089,12 @@
             { label: "Extra information", val: p["Extra information"] }
         ];
 
-        let tableContent = '';
         specs.forEach(spec => {
             if (spec.val && spec.val.toString().trim() !== "") {
-                tableContent += `<tr><td>${spec.label}</td><td>${spec.val}</td></tr>`;
+                let row = `<tr><td>${spec.label}</td><td>${spec.val}</td></tr>`;
+                specTable.innerHTML += row;
             }
         });
-        specTable.innerHTML = tableContent;
 
         document.getElementById('productModal').classList.add('open');
     }

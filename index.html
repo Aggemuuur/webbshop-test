@@ -262,12 +262,13 @@
             font-weight: 600;
         }
 
-        /* Knapp för att rensa filter */
+        /* Knapp för att rensa filter (Mindre och mer kompakt bredd) */
         .clear-btn {
+            display: none; /* Dold som standard, styrs via JS */
             background: transparent;
             border: 1px solid var(--danger-color);
             color: var(--danger-color);
-            padding: 10px 14px;
+            padding: 10px 18px;
             border-radius: 10px;
             font-size: 13px;
             font-weight: 600;
@@ -275,6 +276,8 @@
             transition: all 0.2s ease;
             text-align: center;
             white-space: nowrap;
+            width: fit-content;
+            justify-self: start;
         }
 
         .clear-btn:hover {
@@ -500,7 +503,7 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Primärsortiment: Snygg och diskret grön färg enbart på själva taggen */
+        /* Primärsortiment */
         .sortiment-badge.primar-sortiment {
             background: var(--primar-bg);
             color: var(--primar-text);
@@ -508,7 +511,7 @@
             border-color: var(--border-color);
         }
 
-        /* Utgått-status: Snygg och diskret röd färg enbart på själva taggen */
+        /* Utgått-status */
         .sortiment-badge.utgatt-status {
             background: var(--utgatt-bg);
             color: var(--utgatt-text);
@@ -648,9 +651,10 @@
     let products = [];
     let searchQuery = "";
     
+    // Defaultvärde satt till null i stället för förvalt "Primärsortiment" för att matcha det dynamiska beteendet
     let activeFilters = { 
         Huvudkategori: null, Kategori: null, Underkategori: null,
-        Tillverkare: null, Leverantör: null, Sortiment: "Primärsortiment", Godkännande: null
+        Tillverkare: null, Leverantör: null, Sortiment: null, Godkännande: null
     };
 
     const dropdownFields = [
@@ -769,6 +773,7 @@
 
         const clearBtn = document.createElement('button');
         clearBtn.className = 'clear-btn';
+        clearBtn.id = 'clearFilterBtn';
         clearBtn.innerHTML = '❌ Rensa filter';
         clearBtn.onclick = resetAllFilters;
         rowBox.appendChild(clearBtn);
@@ -785,7 +790,6 @@
         let values = [...new Set(pool.map(p => p[field.key] ? p[field.key].toString().trim() : ""))];
         values = values.filter(v => v !== "");
         
-        // Alfabetisk sortering A-Ö för dropdowns med svenskt språksupport
         values.sort((a, b) => a.localeCompare(b, 'sv'));
 
         const localQuery = dropdownSearchQueries[field.key];
@@ -885,7 +889,6 @@
             if (!structure[hk][k].includes(uk)) structure[hk][k].push(uk);
         });
 
-        // Hämta och sortera Huvudkategorier från A till Ö
         let sortedHKs = Object.keys(structure).sort((a, b) => a.localeCompare(b, 'sv'));
 
         sortedHKs.forEach(hk => {
@@ -909,7 +912,6 @@
                 updateUI();
             };
 
-            // Hämta och sortera Kategorier under denna Huvudkategori från A till Ö
             let sortedKs = Object.keys(structure[hk]).sort((a, b) => a.localeCompare(b, 'sv'));
 
             sortedKs.forEach(k => {
@@ -933,7 +935,6 @@
                     updateUI();
                 };
 
-                // Hämta och sortera Underkategorier från A till Ö
                 let sortedUKs = [...structure[hk][k]].sort((a, b) => a.localeCompare(b, 'sv'));
 
                 sortedUKs.forEach(uk => {
@@ -961,6 +962,22 @@
         });
     }
 
+    // 5b. STYR SYNLIGHETEN FÖR "RENSA FILTER"-KNAPPEN
+    function handleClearButtonVisibility() {
+        const clearBtn = document.getElementById('clearFilterBtn');
+        if (!clearBtn) return;
+
+        // Kontrollera om användaren har gjort någon typ av aktiv filtrering
+        const hasActiveDropdownOrTreeFilter = Object.values(activeFilters).some(val => val !== null);
+        const hasSearchQuery = searchQuery.trim().length > 0;
+
+        if (hasActiveDropdownOrTreeFilter || hasSearchQuery) {
+            clearBtn.style.display = 'inline-block';
+        } else {
+            clearBtn.style.display = 'none';
+        }
+    }
+
     // 6. RENDERA PRODUKTKORT
     function renderProducts() {
         const grid = document.getElementById('productGrid');
@@ -978,12 +995,10 @@
             const card = document.createElement('div');
             card.className = 'product-card';
             
-            // Hantera Sortiment-tagg
             let sortimentText = p.Sortiment && p.Sortiment.trim() !== "" ? p.Sortiment.trim() : "Övrigt sortiment";
             let isPrimar = sortimentText.toLowerCase() === "primärsortiment";
             let sortimentHtml = `<div class="sortiment-badge ${isPrimar ? 'primar-sortiment' : ''}">${sortimentText}</div>`;
 
-            // Hantera Livscykelstatus-tagg (om Utgått)
             let statusText = p.Livscykelstatus && p.Livscykelstatus.trim() !== "" ? p.Livscykelstatus.trim() : "";
             let isUtgatt = statusText.toLowerCase() === "utgått";
             let statusHtml = isUtgatt ? `<div class="sortiment-badge utgatt-status">${statusText}</div>` : '';
@@ -1039,6 +1054,7 @@
         updateAllDropdownOptions();
         buildDynamicTree();
         renderProducts();
+        handleClearButtonVisibility(); // Kontrollerar synligheten efter varje interaktion
     }
 
     // POPUP / MODAL-HANTERING

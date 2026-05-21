@@ -760,6 +760,8 @@
                 closeAllDropdownMenus();
                 if (!isActive) {
                     wrap.classList.add('active');
+                    // OPTIMERING: Rendera bara alternativen för JUST DENNA dropdown när den öppnas!
+                    renderSingleDropdownOptions(field);
                     wrap.querySelector('.dropdown-search-input').focus();
                 }
             });
@@ -782,7 +784,7 @@
         rowBox.appendChild(fragment);
     }
 
-    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN (Prestandaoptimerad via fragment)
+    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN (Körs nu enbart vid klick/sök)
     function renderSingleDropdownOptions(field) {
         const safeId = field.key.replace(/[^a-zA-Z0-9]/g, '_');
         const listEl = document.getElementById(`options-${safeId}`);
@@ -833,18 +835,23 @@
 
         listEl.innerHTML = '';
         listEl.appendChild(fragment);
-
-        if (activeFilters[field.key]) {
-            triggerEl.textContent = activeFilters[field.key];
-            triggerEl.classList.add('has-value');
-        } else {
-            triggerEl.textContent = field.label;
-            triggerEl.classList.remove('has-value');
-        }
     }
 
-    function updateAllDropdownOptions() {
-        dropdownFields.forEach(field => renderSingleDropdownOptions(field));
+    // Uppdaterar bara texterna på knapparna utan att generera listorna i onödan
+    function syncDropdownTriggerLabels() {
+        dropdownFields.forEach(field => {
+            const safeId = field.key.replace(/[^a-zA-Z0-9]/g, '_');
+            const triggerEl = document.getElementById(`trigger-${safeId}`);
+            if (!triggerEl) return;
+
+            if (activeFilters[field.key]) {
+                triggerEl.textContent = activeFilters[field.key];
+                triggerEl.classList.add('has-value');
+            } else {
+                triggerEl.textContent = field.label;
+                triggerEl.classList.remove('has-value');
+            }
+        });
     }
 
     function closeAllDropdownMenus() {
@@ -1042,7 +1049,7 @@
         updateUI();
     });
 
-    // 7. NOLLSTÄLL ALLA FILTER
+    // 7. NOLLSTÄLL ALLA FILTER (Extremt snabb nu!)
     function resetAllFilters() {
         searchQuery = "";
         document.getElementById('searchInput').value = "";
@@ -1056,15 +1063,19 @@
             dropdownSearchQueries[field.key] = "";
             const inputEl = document.getElementById(`search-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}`);
             if (inputEl) inputEl.value = "";
+            
+            // Töm de gamla listorna i bakgrunden så att de måste återskapas fräscha nästa gång man klickar
+            const listEl = document.getElementById(`options-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}`);
+            if (listEl) listEl.innerHTML = '';
         });
         
         updateUI();
     }
 
     function updateUI() {
-        updateAllDropdownOptions();
-        buildDynamicTree();
-        renderProducts();
+        syncDropdownTriggerLabels(); // Synkar bara knapptexterna (går direkt!)
+        buildDynamicTree();          // Bygger trädet blixtsnabbt
+        renderProducts();            // Visar korten
         handleClearButtonVisibility(); 
     }
 

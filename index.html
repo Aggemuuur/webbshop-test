@@ -264,7 +264,7 @@
 
         /* Knapp för att rensa filter (Mindre och mer kompakt bredd) */
         .clear-btn {
-            display: none; /* Dold som standard, styrs via JS */
+            display: none; /* Styrs helt via JS */
             background: transparent;
             border: 1px solid var(--danger-color);
             color: var(--danger-color);
@@ -967,15 +967,11 @@
         const clearBtn = document.getElementById('clearFilterBtn');
         if (!clearBtn) return;
 
-        // Kontrollera om användaren har filtrerat på NÅGOT ANNAT än det förvalda Primärsortimentet
-        const hasTreeFilters = activeFilters.Huvudkategori !== null || activeFilters.Kategori !== null || activeFilters.Underkategori !== null;
-        const hasOtherDropdowns = activeFilters.Tillverkare !== null || activeFilters.Leverantör !== null || activeFilters.Godkännande !== null;
-        
-        // Knappen ska synas om Sortiment ändras från Primärsortiment (eller nollställs till null)
-        const sortimentChanged = activeFilters.Sortiment !== "Primärsortiment";
+        // Knappen ska alltid synas om NÅGOT filter överhuvudtaget är valt (inklusive det förvalda sortimentet)
+        const hasAnyActiveFilter = Object.values(activeFilters).some(val => val !== null);
         const hasSearchQuery = searchQuery.trim().length > 0;
 
-        if (hasTreeFilters || hasOtherDropdowns || sortimentChanged || hasSearchQuery) {
+        if (hasAnyActiveFilter || hasSearchQuery) {
             clearBtn.style.display = 'inline-block';
         } else {
             clearBtn.style.display = 'none';
@@ -1035,14 +1031,14 @@
         updateUI();
     });
 
-    // 7. NOLLSTÄLL ALLA FILTER (Återställer även till standardläget Primärsortiment)
+    // 7. NOLLSTÄLL ALLA FILTER (Rensar absolut allt och sätter ALLA filter till null)
     function resetAllFilters() {
         searchQuery = "";
         document.getElementById('searchInput').value = "";
         
         activeFilters = { 
             Huvudkategori: null, Kategori: null, Underkategori: null,
-            Tillverkare: null, Leverantör: null, Sortiment: "Primärsortiment", Godkännande: null
+            Tillverkare: null, Leverantör: null, Sortiment: null, Godkännande: null
         };
 
         dropdownFields.forEach(field => {
@@ -1069,7 +1065,7 @@
         document.getElementById('modalBrand').innerText = p.Tillverkare || 'Övrigt';
         document.getElementById('modalTitle').innerText = p.Produkt || 'Namnlös produkt';
         document.getElementById('modalSub').innerText = p.Benämning || '';
-        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig för denna artikel.';
+        document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgånglig för denna artikel.';
 
         const imgBox = document.getElementById('modalImageBox');
         if (p.Produktbild && p.Produktbild.trim() !== "") {

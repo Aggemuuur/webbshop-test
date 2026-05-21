@@ -25,6 +25,10 @@
             /* Diskret grön för primärsortiment (Ljust tema) */
             --primar-bg: rgba(34, 197, 94, 0.08);
             --primar-text: #166534;
+
+            /* Diskret röd för utgångna produkter (Ljust tema) */
+            --utgatt-bg: rgba(239, 68, 68, 0.08);
+            --utgatt-text: #991b1b;
         }
 
         [data-theme="dark"] {
@@ -44,6 +48,10 @@
             /* Diskret grön för primärsortiment (Mörkt tema) */
             --primar-bg: rgba(34, 197, 94, 0.1);
             --primar-text: #4ade80;
+
+            /* Diskret röd för utgångna produkter (Mörkt tema) */
+            --utgatt-bg: rgba(239, 68, 68, 0.15);
+            --utgatt-text: #f87171;
         }
 
         * {
@@ -473,6 +481,14 @@
             -webkit-box-orient: vertical;
         }
 
+        /* Taggar-layout */
+        .badge-container {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
         /* Standardbricka för sortiment (Neutral grå) */
         .sortiment-badge {
             font-size: 12px;
@@ -480,17 +496,24 @@
             color: var(--text-color);
             padding: 4px 10px;
             border-radius: 6px;
-            display: inline-block;
-            margin-bottom: 15px;
             font-weight: 500;
             border: 1px solid var(--border-color);
         }
 
-        /* Primärsortiment: Snygg och diskret grön färg enbart på själva taggen (texten & bakgrunden), ej ramen */
+        /* Primärsortiment: Snygg och diskret grön färg enbart på själva taggen */
         .sortiment-badge.primar-sortiment {
             background: var(--primar-bg);
             color: var(--primar-text);
             font-weight: 600;
+            border-color: var(--border-color); /* Behåller den standardiserade ramen */
+        }
+
+        /* Utgått-status: Snygg och diskret röd färg enbart på själva taggen */
+        .sortiment-badge.utgatt-status {
+            background: var(--utgatt-bg);
+            color: var(--utgatt-text);
+            font-weight: 600;
+            border-color: var(--border-color); /* Behåller den standardiserade ramen */
         }
 
         .btn {
@@ -944,11 +967,15 @@
             const card = document.createElement('div');
             card.className = 'product-card';
             
+            // Hantera Sortiment-tagg
             let sortimentText = p.Sortiment && p.Sortiment.trim() !== "" ? p.Sortiment.trim() : "Övrigt sortiment";
             let isPrimar = sortimentText.toLowerCase() === "primärsortiment";
-            
-            // Om den tillhör Primärsortiment, lägg till klassen .primar-sortiment för den gröna stilen
-            let sortimentLabel = `<div class="sortiment-badge ${isPrimar ? 'primar-sortiment' : ''}">${sortimentText}</div>`;
+            let sortimentHtml = `<div class="sortiment-badge ${isPrimar ? 'primar-sortiment' : ''}">${sortimentText}</div>`;
+
+            // Hantera Livscykelstatus-tagg (om Utgått)
+            let statusText = p.Livscykelstatus && p.Livscykelstatus.trim() !== "" ? p.Livscykelstatus.trim() : "";
+            let isUtgatt = statusText.toLowerCase() === "utgått";
+            let statusHtml = isUtgatt ? `<div class="sortiment-badge utgatt-status">${statusText}</div>` : '';
 
             let bildSrc = p.Produktbild && p.Produktbild.trim() !== "" ? p.Produktbild.trim() : "";
             let bildHtml = bildSrc ? `<img src="${bildSrc}" alt="${p.Produkt || ''}">` : `<span style="font-size: 48px;">📦</span>`;
@@ -961,7 +988,11 @@
                     <div class="brand">${p.Tillverkare || 'Övrigt'}</div>
                     <div class="title" title="${p.Produkt || ''}">${p.Produkt || 'Namnlös produkt'}</div>
                     <div class="desc-preview">${p.Benämning || ''}</div>
-                    ${sortimentLabel}
+                    
+                    <div class="badge-container">
+                        ${sortimentHtml}
+                        ${statusHtml}
+                    </div>
                 </div>
                 <button class="btn" onclick="openModal(${p.rowId})">Visa Produktinformation</button>
             `;

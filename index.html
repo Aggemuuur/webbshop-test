@@ -505,7 +505,7 @@
             background: var(--primar-bg);
             color: var(--primar-text);
             font-weight: 600;
-            border-color: var(--border-color); /* Behåller den standardiserade ramen */
+            border-color: var(--border-color);
         }
 
         /* Utgått-status: Snygg och diskret röd färg enbart på själva taggen */
@@ -513,7 +513,7 @@
             background: var(--utgatt-bg);
             color: var(--utgatt-text);
             font-weight: 600;
-            border-color: var(--border-color); /* Behåller den standardiserade ramen */
+            border-color: var(--border-color);
         }
 
         .btn {
@@ -774,7 +774,7 @@
         rowBox.appendChild(clearBtn);
     }
 
-    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN
+    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN (Sorterad från A-Ö)
     function renderSingleDropdownOptions(field) {
         const safeId = field.key.replace(/[^a-zA-Z0-9]/g, '_');
         const listEl = document.getElementById(`options-${safeId}`);
@@ -784,6 +784,8 @@
         const pool = getFilteredProducts(field.key);
         let values = [...new Set(pool.map(p => p[field.key] ? p[field.key].toString().trim() : ""))];
         values = values.filter(v => v !== "");
+        
+        // Alfabetisk sortering A-Ö för dropdowns med svenskt språksupport
         values.sort((a, b) => a.localeCompare(b, 'sv'));
 
         const localQuery = dropdownSearchQueries[field.key];
@@ -843,7 +845,7 @@
         document.addEventListener('click', () => closeAllDropdownMenus());
     }
 
-    // 5. DYNAMISKT FILTERTRÄD
+    // 5. DYNAMISKT FILTERTRÄD (Sorterat från A-Ö)
     function buildDynamicTree() {
         const treeContainer = document.getElementById('dynamicTree');
         treeContainer.innerHTML = '';
@@ -883,7 +885,10 @@
             if (!structure[hk][k].includes(uk)) structure[hk][k].push(uk);
         });
 
-        for (let hk in structure) {
+        // Hämta och sortera Huvudkategorier från A till Ö
+        let sortedHKs = Object.keys(structure).sort((a, b) => a.localeCompare(b, 'sv'));
+
+        sortedHKs.forEach(hk => {
             let hkLi = document.createElement('li');
             hkLi.className = 'tree-item';
             
@@ -904,7 +909,10 @@
                 updateUI();
             };
 
-            for (let k in structure[hk]) {
+            // Hämta och sortera Kategorier under denna Huvudkategori från A till Ö
+            let sortedKs = Object.keys(structure[hk]).sort((a, b) => a.localeCompare(b, 'sv'));
+
+            sortedKs.forEach(k => {
                 let kLi = document.createElement('li');
                 kLi.className = 'tree-item';
                 
@@ -925,7 +933,10 @@
                     updateUI();
                 };
 
-                structure[hk][k].forEach(uk => {
+                // Hämta och sortera Underkategorier från A till Ö
+                let sortedUKs = [...structure[hk][k]].sort((a, b) => a.localeCompare(b, 'sv'));
+
+                sortedUKs.forEach(uk => {
                     let ukLi = document.createElement('li');
                     ukLi.className = 'tree-item';
                     const ukActive = activeFilters.Huvudkategori === hk && activeFilters.Kategori === k && activeFilters.Underkategori === uk;
@@ -943,11 +954,11 @@
 
                 kLi.appendChild(kUl);
                 hkUl.appendChild(kLi);
-            }
+            });
 
             hkLi.appendChild(hkUl);
             treeContainer.appendChild(hkLi);
-        }
+        });
     }
 
     // 6. RENDERA PRODUKTKORT

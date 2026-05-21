@@ -272,6 +272,14 @@
             align-items: center;
             justify-content: center;
             transition: background 0.2s ease;
+            overflow: hidden;
+            padding: 10px;
+        }
+
+        .product-image img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
         }
 
         .product-card:hover .product-image {
@@ -430,7 +438,7 @@
     <div class="modal-content" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeModal()">&times;</button>
         
-        <div style="background: var(--input-bg); border-radius: 16px; display: flex; align-items: center; justify-content: center; height: 320px; border: 1px solid var(--border-color);">
+        <div id="modalImageBox" style="background: var(--input-bg); border-radius: 16px; display: flex; align-items: center; justify-content: center; height: 320px; border: 1px solid var(--border-color); padding: 10px; overflow: hidden;">
             <span style="font-size: 72px;">📦</span>
         </div>
         
@@ -460,7 +468,6 @@
     // FUNKTION FÖR ATT VÄXLA THEME (DARK / LIGHT)
     const toggleBtn = document.getElementById('themeToggleBtn');
     
-    // Kolla om användaren har sparat ett val tidigare, annars välj mörkt tema som standard från bilden
     const currentTheme = localStorage.getItem('theme') || 'dark';
     document.documentElement.setAttribute('data-theme', currentTheme);
     toggleBtn.innerText = currentTheme === 'dark' ? '☀️' : '🌙';
@@ -478,7 +485,7 @@
         }
     });
 
-    // 1. HÄMTA JSON-FILEN SOM LIGGER I SAMMA MAPP PÅ GITHUB
+    // 1. HÄMTA JSON-FILEN
     function loadData() {
         const jsonUrl = "produkter.json"; 
 
@@ -593,7 +600,7 @@
         renderProducts();
     }
 
-    // 4. RENDERA OCH VISA PRODUKTKORTEN
+    // 4. RENDERA OCH VISA PRODUKTKORTEN MED BILDSTÖD
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
@@ -630,8 +637,15 @@
                 idLabel = `<div style="height:34px"></div>`;
             }
 
+            // Kontrollera om det finns en bildlänk i kolumnen "Produktbild", annars kör vi paketet som fallback
+            let bildSrc = p.Produktbild && p.Produktbild.trim() !== "" ? p.Produktbild.trim() : "";
+            let bildHtml = bildSrc ? `<img src="${bildSrc}" alt="${p.Produkt || ''}">` : `<span style="font-size: 48px;">📦</span>`;
+
             card.innerHTML = `
                 <div>
+                    <div class="product-image">
+                        ${bildHtml}
+                    </div>
                     <div class="brand">${p.Tillverkare || 'Övrigt'}</div>
                     <div class="title" title="${p.Produkt || ''}">${p.Produkt || 'Namnlös produkt'}</div>
                     <div class="desc-preview">${p.Benämning || ''}</div>
@@ -658,6 +672,14 @@
         document.getElementById('modalTitle').innerText = p.Produkt || 'Namnlös produkt';
         document.getElementById('modalSub').innerText = p.Benämning || '';
         document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig for denna artikel.';
+
+        // Uppdatera bilden i popupen dynamiskt
+        const imgBox = document.getElementById('modalImageBox');
+        if (p.Produktbild && p.Produktbild.trim() !== "") {
+            imgBox.innerHTML = `<img src="${p.Produktbild.trim()}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="${p.Produkt || ''}">`;
+        } else {
+            imgBox.innerHTML = `<span style="font-size: 72px;">📦</span>`;
+        }
 
         const specTable = document.getElementById('specTable');
         specTable.innerHTML = '';

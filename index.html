@@ -21,6 +21,10 @@
             --danger-color: #ef4444;
             --danger-hover: #dc2626;
             --dropdown-shadow: rgba(0, 0, 0, 0.08);
+            
+            /* Diskret grön för primärsortiment (Ljust tema) */
+            --primar-bg: rgba(34, 197, 94, 0.08);
+            --primar-text: #166534;
         }
 
         [data-theme="dark"] {
@@ -36,6 +40,10 @@
             --danger-color: #f87171;
             --danger-hover: #ef4444;
             --dropdown-shadow: rgba(0, 0, 0, 0.4);
+            
+            /* Diskret grön för primärsortiment (Mörkt tema) */
+            --primar-bg: rgba(34, 197, 94, 0.1);
+            --primar-text: #4ade80;
         }
 
         * {
@@ -465,7 +473,7 @@
             -webkit-box-orient: vertical;
         }
 
-        /* Bricka för att visa sortimentstillhörighet */
+        /* Standardbricka för sortiment (Neutral grå) */
         .sortiment-badge {
             font-size: 12px;
             background: var(--input-bg);
@@ -476,7 +484,13 @@
             margin-bottom: 15px;
             font-weight: 500;
             border: 1px solid var(--border-color);
-            text-transform: capitalize;
+        }
+
+        /* Primärsortiment: Snygg och diskret grön färg enbart på själva taggen (texten & bakgrunden), ej ramen */
+        .sortiment-badge.primar-sortiment {
+            background: var(--primar-bg);
+            color: var(--primar-text);
+            font-weight: 600;
         }
 
         .btn {
@@ -913,7 +927,7 @@
         }
     }
 
-    // 6. RENDERA PRODUKTKORT (ÄNDRAD: Visar Sortiment istället för E-nr/Art.nr)
+    // 6. RENDERA PRODUKTKORT
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
@@ -930,9 +944,11 @@
             const card = document.createElement('div');
             card.className = 'product-card';
             
-            // Hämta sortimentets värde, eller sätt till "Övrigt sortiment" om fältet saknas i JSON
             let sortimentText = p.Sortiment && p.Sortiment.trim() !== "" ? p.Sortiment.trim() : "Övrigt sortiment";
-            let sortimentLabel = `<div class="sortiment-badge">${sortimentText}</div>`;
+            let isPrimar = sortimentText.toLowerCase() === "primärsortiment";
+            
+            // Om den tillhör Primärsortiment, lägg till klassen .primar-sortiment för den gröna stilen
+            let sortimentLabel = `<div class="sortiment-badge ${isPrimar ? 'primar-sortiment' : ''}">${sortimentText}</div>`;
 
             let bildSrc = p.Produktbild && p.Produktbild.trim() !== "" ? p.Produktbild.trim() : "";
             let bildHtml = bildSrc ? `<img src="${bildSrc}" alt="${p.Produkt || ''}">` : `<span style="font-size: 48px;">📦</span>`;
@@ -983,7 +999,7 @@
         renderProducts();
     }
 
-    // POPUP / MODAL-HANTERING (E-nummer och specifikationer finns fortfarande kvar här inne)
+    // POPUP / MODAL-HANTERING
     function openModal(rowId) {
         const p = products.find(prod => prod.rowId === rowId);
         if (!p) return;

@@ -43,7 +43,7 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             padding: 30px 20px;
-            transition: background-color 0.3s ease, color 0.3s ease;
+            /* Transition borttagen härifrån för direkt färgomslag */
         }
 
         .container {
@@ -104,10 +104,10 @@
             border: 2px solid var(--border-color);
             border-radius: 50px;
             font-size: 15px;
-            transition: all 0.3s ease;
             outline: none;
             background: var(--input-bg);
             color: var(--text-title);
+            /* Transition borttagen för att undvika lagg vid sökfokus i mörkt läge */
         }
 
         .search-bar input:focus {
@@ -129,7 +129,6 @@
             align-items: center;
             justify-content: center;
             font-size: 20px;
-            transition: all 0.3s ease;
             flex-shrink: 0;
         }
         
@@ -190,7 +189,6 @@
             color: var(--text-color);
             font-weight: 500;
             font-size: 14px;
-            transition: all 0.15s ease;
         }
 
         .tree-label:hover {
@@ -206,7 +204,7 @@
         .toggle-arrow {
             margin-right: 8px;
             font-size: 11px;
-            transition: transform 0.2s ease;
+            transition: transform 0.2s ease; /* Behåller denna då den bara snurrar pilen lokalt */
             display: inline-block;
             width: 12px;
             text-align: center;
@@ -216,7 +214,7 @@
             padding-left: 16px !important;
             max-height: 0;
             overflow: hidden;
-            transition: max-height 0.25s ease-out;
+            transition: max-height 0.25s ease-out; /* Behåller denna för mjuk utfällning av menyer */
         }
 
         .expanded > .sub-menu {
@@ -253,13 +251,14 @@
             flex-direction: column;
             justify-content: space-between;
             border: 1px solid var(--border-color);
-            transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1), box-shadow 0.3s ease, border-color 0.3s ease;
         }
 
         .product-card:hover {
             transform: translateY(-6px);
             box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
             border-color: rgba(88, 197, 202, 0.4);
+            /* Tips: Om du vill ha mjukt hovrat kort lämnar vi transition enbart för hovringen här, det påverkar inte färgbytet */
+            transition: transform 0.2s ease, box-shadow 0.2s ease; 
         }
 
         .product-image {
@@ -271,7 +270,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: background 0.2s ease;
             overflow: hidden;
             padding: 10px;
         }
@@ -341,7 +339,6 @@
             font-size: 14px;
             cursor: pointer;
             width: 100%;
-            transition: all 0.2s ease;
             box-shadow: 0 4px 12px rgba(88, 197, 202, 0.15);
         }
 
@@ -358,8 +355,8 @@
             backdrop-filter: blur(8px);
             display: flex; align-items: center; justify-content: center;
             opacity: 0; pointer-events: none;
-            transition: opacity 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             z-index: 1000;
+            /* Transition borttagen från öppna/stäng av modalen för maximal prestanda */
         }
 
         .modal.open { opacity: 1; pointer-events: auto; }
@@ -371,12 +368,8 @@
             max-width: 900px; width: 95%; max-height: 90vh; overflow-y: auto;
             position: relative; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
             display: grid; grid-template-columns: 1fr 1.2fr; gap: 40px;
-            transform: translateY(40px) scale(0.95);
-            transition: transform 0.4s cubic-bezier(0.25, 1, 0.5, 1);
             border: 1px solid var(--border-color);
         }
-
-        .modal.open .modal-content { transform: translateY(0) scale(1); }
 
         @media (max-width: 768px) {
             .modal-content { 
@@ -391,11 +384,11 @@
             cursor: pointer; border: none; background: var(--input-bg); color: var(--text-muted);
             width: 40px; height: 40px; border-radius: 50%;
             display: flex; align-items: center; justify-content: center;
-            transition: all 0.2s ease; z-index: 10;
+            z-index: 10;
             border: 1px solid var(--border-color);
         }
 
-        .close-modal:hover { background: var(--tree-hover); color: var(--text-title); transform: rotate(90deg); }
+        .close-modal:hover { background: var(--tree-hover); color: var(--text-title); transform: rotate(90deg); transition: transform 0.2s ease; }
 
         /* Teknisk Specifikation-tabell */
         .spec-table {
@@ -465,7 +458,7 @@
     let activeFilters = { Huvudkategori: null, Kategori: null, Underkategori: null };
     let searchQuery = "";
 
-    // FUNKTION FÖR ATT VÄXLA THEME (DARK / LIGHT)
+    // FUNKTION FÖR ATT VÄXLA THEME (DARK / LIGHT) - HELT UTAN TRANSITIONS NU
     const toggleBtn = document.getElementById('themeToggleBtn');
     
     const currentTheme = localStorage.getItem('theme') || 'dark';
@@ -600,7 +593,7 @@
         renderProducts();
     }
 
-    // 4. RENDERA OCH VISA PRODUKTKORTEN MED BILDSTÖD
+    // 4. RENDERA OCH VISA PRODUKTKORTEN
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         grid.innerHTML = '';
@@ -637,7 +630,6 @@
                 idLabel = `<div style="height:34px"></div>`;
             }
 
-            // Kontrollera om det finns en bildlänk i kolumnen "Produktbild", annars kör vi paketet som fallback
             let bildSrc = p.Produktbild && p.Produktbild.trim() !== "" ? p.Produktbild.trim() : "";
             let bildHtml = bildSrc ? `<img src="${bildSrc}" alt="${p.Produkt || ''}">` : `<span style="font-size: 48px;">📦</span>`;
 
@@ -673,7 +665,6 @@
         document.getElementById('modalSub').innerText = p.Benämning || '';
         document.getElementById('modalDesc').innerText = p.Beskrivning || p["Extra information"] || 'Ingen ytterligare beskrivning tillgänglig for denna artikel.';
 
-        // Uppdatera bilden i popupen dynamiskt
         const imgBox = document.getElementById('modalImageBox');
         if (p.Produktbild && p.Produktbild.trim() !== "") {
             imgBox.innerHTML = `<img src="${p.Produktbild.trim()}" style="max-width:100%; max-height:100%; object-fit:contain;" alt="${p.Produkt || ''}">`;

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Digital Produktkatalog</title>
+    <title>Produktkatalog</title>
     <style>
         /* Färgteman */
         :root {
@@ -99,8 +99,31 @@
             }
         }
 
+        /* Ny layout för Logga + Text */
+        .brand-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        /* LOGO CONTAINER: Bestämmer storleken på din logotyp */
+        .logo-container {
+            width: 60px;          /* Justera bredden på loggan här */
+            height: 60px;         /* Justera höjden på loggan här */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;  /* Ser till att loggan inte blir utsträckt eller skev */
+        }
+
         .header-title h2 {
-            font-size: 24px;
+            font-size: 26px;
             font-weight: 700;
             color: var(--text-title);
         }
@@ -152,7 +175,7 @@
             align-items: center;
         }
 
-        /* Custom Sökbar Dropdown Struktur */
+        /* Custom Dropdown */
         .custom-dropdown {
             position: relative;
             width: 100%;
@@ -262,9 +285,8 @@
             font-weight: 600;
         }
 
-        /* Knapp för att rensa filter */
         .clear-btn {
-            display: none; /* Styrs helt via JS */
+            display: none; 
             background: transparent;
             border: 1px solid var(--danger-color);
             color: var(--danger-color);
@@ -484,7 +506,7 @@
             -webkit-box-orient: vertical;
         }
 
-        /* Taggar-layout */
+        /* Taggar */
         .badge-container {
             display: flex;
             gap: 8px;
@@ -492,7 +514,6 @@
             flex-wrap: wrap;
         }
 
-        /* Standardbricka för sortiment (Neutral grå) */
         .sortiment-badge {
             font-size: 12px;
             background: var(--input-bg);
@@ -503,7 +524,6 @@
             border: 1px solid var(--border-color);
         }
 
-        /* Primärsortiment */
         .sortiment-badge.primar-sortiment {
             background: var(--primar-bg);
             color: var(--primar-text);
@@ -511,7 +531,6 @@
             border-color: var(--border-color);
         }
 
-        /* Utgått-status */
         .sortiment-badge.utgatt-status {
             background: var(--utgatt-bg);
             color: var(--utgatt-text);
@@ -537,7 +556,7 @@
             box-shadow: 0 6px 16px rgba(88, 197, 202, 0.25);
         }
 
-        /* PAGINATION STYLING */
+        /* PAGINATION */
         .pagination-container {
             display: flex;
             justify-content: center;
@@ -618,7 +637,6 @@
 
         .close-modal:hover { background: var(--tree-hover); color: var(--text-title); transform: rotate(90deg); transition: transform 0.2s ease; }
 
-        /* Teknisk Specifikation-tabell */
         .spec-table {
             width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px;
         }
@@ -632,13 +650,19 @@
 <div class="container">
     <header>
         <div class="header-top">
-            <div class="header-title">
-                <h2>Digital Produktkatalog</h2>
-                <p id="product-count">Läser in artiklar...</p>
+            <div class="brand-wrapper">
+                <div class="logo-container">
+                    <img id="appLogo" src="logo.png" alt="Företagslogotyp">
+                </div>
+                <div class="header-title">
+                    <h2>Produktkatalog</h2>
+                    <p id="product-count">Läser in artiklar...</p>
+                </div>
             </div>
+            
             <div class="header-controls">
                 <div class="search-bar">
-                    <input type="text" id="searchInput" placeholder="Sök på produkt, benämning, E-nummer, tillverkare...">
+                    <input type="text" id="searchInput" placeholder="Sök på produkt, benämning, E-nummer, tillverkare..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false">
                 </div>
                 <button class="theme-toggle-btn" id="themeToggleBtn" title="Ändra färgtema">🌙</button>
             </div>
@@ -691,11 +715,9 @@
     let products = [];
     let searchQuery = "";
     
-    // Konfiguration för sidnumrering
     let currentPage = 1;
-    const itemsPerPage = 24; // Hur många kort som ritas samtidigt på skärmen
+    const itemsPerPage = 24; 
     
-    // Sätter "Primärsortiment" som förvalt standardfilter vid laddning
     let activeFilters = { 
         Huvudkategori: null, Kategori: null, Underkategori: null,
         Tillverkare: null, Leverantör: null, Sortiment: "Primärsortiment", Godkännande: null
@@ -733,6 +755,12 @@
             toggleBtn.innerText = '☀️';
             localStorage.setItem('theme', 'dark');
         }
+    });
+
+    // Om din logotyp saknas eller inte laddas döljer vi trasiga bildikoner automatiskt
+    const logoImg = document.getElementById('appLogo');
+    logoImg.addEventListener('error', () => {
+        logoImg.style.display = 'none';
     });
 
     // 1. DATALADDNING
@@ -779,7 +807,7 @@
         });
     }
 
-    // 3. SKAPA STRUKTUREN FÖR DE SÖKBARA MENYERNA
+    // 3. DROPDOWNS
     function buildDropdownHTML() {
         const rowBox = document.getElementById('filterRowBox');
         rowBox.innerHTML = '';
@@ -793,7 +821,7 @@
             wrap.innerHTML = `
                 <button class="dropdown-trigger" id="trigger-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}">${field.label}</button>
                 <div class="dropdown-menu-content">
-                    <input type="text" class="dropdown-search-input" placeholder="Sök i listan..." id="search-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}">
+                    <input type="text" class="dropdown-search-input" placeholder="Sök i listan..." id="search-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}" autocomplete="off">
                     <ul class="dropdown-options-list" id="options-${field.key.replace(/[^a-zA-Z0-9]/g, '_')}"></ul>
                 </div>
             `;
@@ -809,10 +837,13 @@
                 }
             });
 
-            wrap.querySelector('.dropdown-search-input').addEventListener('input', (e) => {
+            const dropSearch = wrap.querySelector('.dropdown-search-input');
+            const runDropSearch = (e) => {
                 dropdownSearchQueries[field.key] = e.target.value.toLowerCase();
                 renderSingleDropdownOptions(field); 
-            });
+            };
+            dropSearch.addEventListener('input', runDropSearch);
+            dropSearch.addEventListener('keyup', runDropSearch);
 
             fragment.appendChild(wrap);
         });
@@ -827,7 +858,6 @@
         rowBox.appendChild(fragment);
     }
 
-    // 4. RENDERA ALTERNATIVEN I EN SPECIFIK DROPDOWN
     function renderSingleDropdownOptions(field) {
         const safeId = field.key.replace(/[^a-zA-Z0-9]/g, '_');
         const listEl = document.getElementById(`options-${safeId}`);
@@ -855,7 +885,7 @@
             triggerEl.textContent = field.label;
             triggerEl.classList.remove('has-value');
             closeAllDropdownMenus();
-            currentPage = 1; // Nollställ sida vid ändrat filter
+            currentPage = 1; 
             updateUI();
         };
         fragment.appendChild(allOpt);
@@ -872,7 +902,7 @@
                 triggerEl.textContent = val;
                 triggerEl.classList.add('has-value');
                 closeAllDropdownMenus();
-                currentPage = 1; // Nollställ sida vid ändrat filter
+                currentPage = 1; 
                 updateUI();
             };
             fragment.appendChild(opt);
@@ -906,7 +936,7 @@
         document.addEventListener('click', () => closeAllDropdownMenus());
     }
 
-    // 5. DYNAMISKT FILTERTRÄD
+    // 5. TRÄDMENU
     function buildDynamicTree() {
         const treeContainer = document.getElementById('dynamicTree');
         const fragment = document.createDocumentFragment();
@@ -1040,7 +1070,7 @@
         }
     }
 
-    // 6. RENDERA PRODUKTKORT MED SIDNUMRERING (Extremt snabb prestanda!)
+    // 6. PRODUKTGALLERI & PAGINATION
     function renderProducts() {
         const grid = document.getElementById('productGrid');
         const filtered = getFilteredProducts();
@@ -1052,7 +1082,6 @@
             return;
         }
 
-        // Räkna ut vilka produkter som hör till den aktuella sidan
         const startIndex = (currentPage - 1) * itemsPerPage;
         const endIndex = startIndex + itemsPerPage;
         const pageItems = filtered.slice(startIndex, endIndex);
@@ -1096,21 +1125,18 @@
         grid.innerHTML = '';
         grid.appendChild(fragment);
 
-        // Rendera sidknapparna baserat på totalt antal matchade produkter
         renderPagination(filtered.length);
     }
 
-    // INTERFAJS FÖR SIDNUMRERING
     function renderPagination(totalItems) {
         const pBox = document.getElementById('paginationBox');
         pBox.innerHTML = '';
         
         const totalPages = Math.ceil(totalItems / itemsPerPage);
-        if (totalPages <= 1) return; // Behövs inga knappar om allt ryms på en sida
+        if (totalPages <= 1) return; 
 
         const fragment = document.createDocumentFragment();
 
-        // Föregående-knapp
         const prevBtn = document.createElement('button');
         prevBtn.className = 'pagination-btn';
         prevBtn.innerText = '◄ Föregående';
@@ -1118,13 +1144,12 @@
         prevBtn.onclick = () => {
             if (currentPage > 1) {
                 currentPage--;
-                window.scrollTo({top: 0, behavior: 'smooth'});
+                window.scrollTo({top: 0});
                 renderProducts();
             }
         };
         fragment.appendChild(prevBtn);
 
-        // Sifferknappar (visar max ett par stycken runt nuvarande sida för att hålla det rent)
         let startPage = Math.max(1, currentPage - 2);
         let endPage = Math.min(totalPages, currentPage + 2);
 
@@ -1149,7 +1174,7 @@
             pageBtn.innerText = i;
             pageBtn.onclick = () => {
                 currentPage = i;
-                window.scrollTo({top: 0, behavior: 'smooth'});
+                window.scrollTo({top: 0});
                 renderProducts();
             };
             fragment.appendChild(pageBtn);
@@ -1170,7 +1195,6 @@
             fragment.appendChild(lastBtn);
         }
 
-        // Nästa-knapp
         const nextBtn = document.createElement('button');
         nextBtn.className = 'pagination-btn';
         nextBtn.innerText = 'Nästa ►';
@@ -1178,7 +1202,7 @@
         nextBtn.onclick = () => {
             if (currentPage < totalPages) {
                 currentPage++;
-                window.scrollTo({top: 0, behavior: 'smooth'});
+                window.scrollTo({top: 0});
                 renderProducts();
             }
         };
@@ -1187,11 +1211,15 @@
         pBox.appendChild(fragment);
     }
 
-    document.getElementById('searchInput').addEventListener('input', (e) => {
+    const searchInput = document.getElementById('searchInput');
+    const handleSearchEvent = (e) => {
         searchQuery = e.target.value.toLowerCase();
-        currentPage = 1; // Återställ alltid till sida 1 vid sökning
+        currentPage = 1; 
         updateUI();
-    });
+    };
+    
+    searchInput.addEventListener('input', handleSearchEvent);
+    searchInput.addEventListener('keyup', handleSearchEvent);
 
     // 7. NOLLSTÄLL ALLA FILTER
     function resetAllFilters() {
@@ -1223,7 +1251,7 @@
         handleClearButtonVisibility(); 
     }
 
-    // POPUP / MODAL-HANTERING
+    // POPUP / MODAL
     function openModal(rowId) {
         const p = products.find(prod => prod.rowId === rowId);
         if (!p) return;
